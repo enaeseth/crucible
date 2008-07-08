@@ -48,6 +48,33 @@ Crucible.augment(Crucible.Test.prototype,
 	 */
 	test: null,
 	
+	
+	/**
+	 * Runs the test.
+	 * @param {Object} test runner
+	 * @throws {Crucible.Failure} if an assertion in the test fails
+	 * @throws {Crucible.UnexpectedError} if the test code generates an
+	 *         unexpected exception
+	 * @return {void}
+	 */
+	run: function run_test(runner) {
+		var unit = new Crucible.Test.Unit(this, this.test, this.expected);
+		unit.run(runner);
+	}
+});
+
+/**
+ * @class One contigiously-executing block of a test.
+ */
+Crucible.Test.Unit = function TestUnit(test, unit, expected) {
+	this.test = test;
+	this.unit = unit;
+	this.expected = expected;
+};
+
+Crucible.augment(Crucible.Test.Unit.prototype,
+	/** @lends Crucible.Test.Unit.prototype */
+{
 	/**
 	 * The Crucible runner object.
 	 * @protected
@@ -56,14 +83,14 @@ Crucible.augment(Crucible.Test.prototype,
 	runner: null,
 	
 	/**
-	 * Runs the test.
-	 * @param {Function} a function that will be called with the test's result
+	 * Runs the test unit.
+	 * @param {Object} test runner
 	 * @throws {Crucible.Failure} if an assertion in the test fails
 	 * @throws {Crucible.UnexpectedError} if the test code generates an
 	 *         unexpected exception
 	 * @return {void}
 	 */
-	run: function run_test(runner) {
+	run: function run_test_unit(runner) {
 		var ex_desc;
 		
 		if (typeof(callback) != 'function') {
@@ -75,7 +102,7 @@ Crucible.augment(Crucible.Test.prototype,
 		
 		try {
 			try {
-				this.test();
+				this.unit();
 			} catch (e) {
 				if (e.name == 'Crucible.Failure') {
 					return this.runner.report(this, e);
@@ -102,38 +129,5 @@ Crucible.augment(Crucible.Test.prototype,
 		} finally {
 			this.runner = null; // cleanup
 		}
-	},
-	
-	/**
-	 * Asynchronusly reports the test results.
-	 * @param {Boolean|Error} result true if the test was successful, or a
-	 *        Crucible error if it was not
-	 * @return {void}
-	 */
-	finish: function finish_test(result) {
-		try {
-			this._callback(result);
-		} finally {
-			this._callback = null;
-		}
-	},
-	
-	/**
-	 * Creates a clone of this test with the same name and runner, but different
-	 * test code and a different expected exception.
-	 * @param {Function} test the test function
-	 * @param {String|Boolean} [expected=false] an exception that this test must
-	 *        generate in order to pass
-	 * @return {Crucible.Test} the spawned test
-	 */
-	spawn: function spawn_test(test, expected) {
-		var test;
-		
-		if (!this.runner)
-			throw new Error("Can only spawn a test while it is being run.");
-		
-		test = new Crucible.Test(this.name, test, expected);
-		test.runner = this.runner;
-		return test;
 	}
 });
