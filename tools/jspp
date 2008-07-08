@@ -1,0 +1,73 @@
+#!/usr/bin/env python
+
+"""
+JSPP: A crude JavaScript Preprocessor
+
+Copyright (c) 2008 Eric Naeseth.
+"""
+
+from optparse import OptionParser
+import os
+import sys
+import re
+
+class Preprocessor(object):
+	"""The JavaScript preprocessor."""
+	def __init__(self, include_path):
+		super(Preprocessor, self).__init__()
+		self.include_path = include_path.split(os.pathsep)
+		self.done = {}
+		
+	incl_pattern = re.compile('^\s*#include\s*("([^"]+)"|<([^>]+)>).*$')
+	
+	def process(self, path, filename):
+		real_path = os.path.normpath(os.path.join(path, filename))
+		if real_path in self.done:
+			return ''
+		self.done[real_path] = True
+		
+		def get_path(match):
+			def fix(path):
+				return os.path.split(os.path.normpath(path))
+			 
+			if match.group(1)[0] == '"':
+				return fix(os.path.join(path, match.group(2)))
+			else:
+				# scan
+				for incdir in self.include_path:
+					file_loc = os.path.join(incdir, match.group(3))
+					if os.path.isfile(file_loc):
+						return fix(file_loc)
+				raise IOError("Unable to find %s in the include path." %
+					match.group(1))
+		
+		output = []
+		for num, line in enumerate(file(os.path.join(path, filename))):
+			match = self.incl_pattern.search(line)
+			if not match:
+				output.append(line)
+			else:
+				try:
+					output.append(self.process(*get_path(match)))
+				except IOError, e:
+					print >>sys.stderr, ("error at %s:%d: %s" %
+						(os.path.join(path, filename), num + 1, e))
+					sys.exit(-1)
+		
+		return ''.join(output)
+	
+def main():
+	parser = OptionParser()
+	parser.add_option('-I', dest='include_path',
+		help='a %s-separated list of folders to scan for files' % os.pathsep,
+		default='')
+	
+	options, args = parser.parse_args()
+	
+	pp = Preprocessor(options.include_path)
+	path, filename = os.path.split(args[0])
+	print pp.process(path, filename)
+
+
+if __name__ == '__main__':
+	main()
