@@ -49,5 +49,11 @@ Crucible.augment(Crucible.Fixture.prototype,
 	 */
 	tearDown: Crucible.emptyFunction,
 	
+	add: function add_test_to_fixture(name, test, expected) {
+		test.push((typeof(name) == 'object')
+			? name
+			: new Crucible.Test(name, test, expected));
+	}
+	
 	
 });

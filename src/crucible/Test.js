@@ -129,5 +129,45 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 		} finally {
 			this.runner = null; // cleanup
 		}
+	},
+	
+	assertEqual: function assert_equal(expected, actual, message) {
+		if (!Crucible.equal(expected, actual)) {
+			throw new Crucible.Failure(this.test, message ||
+				'Expected ' + expected + ' but got ' + actual + '.');
+		}
+	},
+	
+	assertNull: function assert_null(object, message) {
+		if (object !== null) {
+			throw new Crucible.Failure(this.test, message ||
+				'Object should be null.');
+		}
+	},
+	
+	assertNotNull: function assert_not_null(object, message) {
+		if (object === null || typeof(object) == 'undefined') {
+			throw new Crucible.Failure(this.test, message ||
+				'Object should not be null.');
+		}
+	},
+	
+	assert: function assert(condition, message) {
+		if (!condition) {
+			throw new Crucible.Failure(this.test, message ||
+				'(unspecified reason)');
+		}
+	},
+	
+	assertFalse: function assert_false(condition, message) {
+		if (condition) {
+			throw new Crucible.Failure(this.test, message ||
+				'(unspecified reason)');
+		}
+	},
+	
+	fail: function fail(message) {
+		throw new Crucible.Failure(this.test, message ||
+			'(unspecified reason)');
 	}
 });

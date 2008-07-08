@@ -27,6 +27,36 @@ var Crucible = {
 	},
 	
 	/**
+	 * Determines if two values are equal.
+	 * @return {Boolean}
+	 */
+	equal: function objects_equal(a, b) {
+		var seen;
+		if (typeof(a) != 'object') {
+			return (typeof(b) == 'object')
+				? false
+				: (a == b);
+		} else if (typeof(b) != 'object') {
+			return false;
+		}
+
+		seen = {};
+
+		for (var name in a) {
+			if (!(name in b && Object.equal(a[name], b[name])))
+				return false;
+			seen[name] = true;
+		}
+
+		for (var name in b) {
+			if (!(name in seen))
+				return false;
+		}
+
+		return true;
+	},
+	
+	/**
 	 * A function that does nothing. Useful as a standin.
 	 * @return {void}
 	 */
@@ -45,5 +75,7 @@ var Crucible = {
 };
 
 #include "crucible/Failure.js"
+#include "crucible/AsyncCompletion.js"
+#include "crucible/UnexpectedError.js"
 #include "crucible/Test.js"
 #include "crucible/Fixture.js"
