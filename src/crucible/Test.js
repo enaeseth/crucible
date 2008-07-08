@@ -53,7 +53,7 @@ Crucible.augment(Crucible.Test.prototype,
 	 * @protected
 	 * @type Object
 	 */
-	_runner: null,
+	runner: null,
 	
 	/**
 	 * Runs the test.
@@ -71,26 +71,36 @@ Crucible.augment(Crucible.Test.prototype,
 				"function to pass the results to.");
 		}
 		
-		this._runner = runner;
+		this.runner = runner;
 		
 		try {
-			this.test();
-		} catch (e) {
-			if (e.name == 'Crucible.Failure') {
-				throw e;
-			} else if (this.expected === true || this.expected == e.name) {
-				return; // OK; we were expecting this.
-			} else {
-				throw new Crucible.UnexpectedError(this, e);
+			try {
+				this.test();
+			} catch (e) {
+				if (e.name == 'Crucible.Failure') {
+					return this.runner.report(this, e);
+				} else if (e.name == 'Crucible.AsyncCompletion') {
+					return;
+				} else if (this.expected === true || this.expected == e.name) {
+					return this.runner.report(this, true);
+				} else {
+					return this.runner.report(this,
+						new Crucible.UnexpectedError(this, e));
+				}
 			}
-		}
 	
-		if (this.expected) {
-			ex_desc = (this.expected === true)
-				? "an exception"
-				: 'a "' + this.expected + '" exception';
-			throw new Crucible.Failure(this, "The test was expecting "
-				+ ex_desc + " to be thrown, but none was.");
+			if (this.expected) {
+				ex_desc = (this.expected === true)
+					? "an exception"
+					: 'a "' + this.expected + '" exception';
+				return this.runner.report(this, new Crucible.Failure(this,
+					"The test was expecting " + ex_desc + " to be thrown, " +
+					"but none was."));
+			}
+			
+			this.runner.report(this, true);
+		} finally {
+			this.runner = null; // cleanup
 		}
 	},
 	
@@ -117,6 +127,13 @@ Crucible.augment(Crucible.Test.prototype,
 	 * @return {Crucible.Test} the spawned test
 	 */
 	spawn: function spawn_test(test, expected) {
+		var test;
 		
+		if (!this.runner)
+			throw new Error("Can only spawn a test while it is being run.");
+		
+		test = new Crucible.Test(this.name, test, expected);
+		test.runner = this.runner;
+		return test;
 	}
 });
