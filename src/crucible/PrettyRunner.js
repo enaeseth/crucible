@@ -17,6 +17,17 @@ Crucible.PrettyRunner.prototype = new Crucible.Runner();
 Crucible.augment(Crucible.PrettyRunner.prototype,
 	/** @lends Crucible.PrettyRunner.prototype */
 {
+	/**
+	 * PrettyRunner status.
+	 * @type String
+	 */
+	status: null,
+	
+	/**
+	 * The product that the PrettyRunner is testing.
+	 */
+	product: 'the product',
+	
 	doneAdding: function done_adding_tasks_to_pretty_runner() {
 		var msg;
 		this._done_adding = true;
@@ -57,7 +68,8 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		this._test_msg.setType('fail');
 		this._test_msg.setMessage('Test &ldquo;' + test.name + '&rdquo; ' +
 			'<b>failed</b>: ' + failure.description);
-		this.setStatus('failure');
+		if (this.status == 'ok')
+			this.setStatus('failure');
 		this.tallies.fail++;
 		this._test_msg = null;
 	},
@@ -244,6 +256,7 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 			default:
 				throw new Error('Unknown runner status code "' + status + '".');
 		}
+		this.status = status;
 	},
 	
 	/**

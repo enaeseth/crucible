@@ -92,6 +92,7 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 	 */
 	run: function run_test_unit(runner) {
 		var ex_desc;
+		var test = this.test;
 		
 		if (typeof(runner) != 'object' || typeof(runner.report) != 'function') {
 			throw new TypeError("Cannot run a test without a Crucible test " +
@@ -99,6 +100,16 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 		}
 		
 		this.runner = runner;
+		
+		function pass() {
+			this.runner.report(test, true);
+		}
+		function fail(message) {
+			this.runner.report(test, new Crucible.Failure(test, message));
+		}
+		function unexpected_error(error) {
+			this.runner.report(test, new Crucible.UnexpectedError(test, error));
+		}
 		
 		try {
 			try {
@@ -108,11 +119,18 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 					return this.runner.report(this.test, e);
 				} else if (e.name == 'Crucible.AsyncCompletion') {
 					return;
-				} else if (this.expected === true || this.expected == e.name) {
-					return this.runner.report(this.test, true);
+				} else if (this.expected) {
+					if (this.expected === true) {
+						pass();
+					} else if (this.expected == e.name) {
+						pass();
+					} else {
+						fail('Expected a "' + this.expected + '" exception, ' +
+							'but the test threw ' + e.toString() + ' instead.');
+					}
+					return;
 				} else {
-					return this.runner.report(this.test,
-						new Crucible.UnexpectedError(this, e));
+					unexpected_error(e);
 				}
 			}
 	
@@ -120,9 +138,8 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 				ex_desc = (this.expected === true)
 					? "an exception"
 					: 'a "' + this.expected + '" exception';
-				return this.runner.report(this.test, new Crucible.Failure(this,
-					"The test was expecting " + ex_desc + " to be thrown, " +
-					"but none was."));
+				return fail("Expected " + ex_desc + ' to be thrown, but none ' +
+					'was.');
 			}
 			
 			this.runner.report(this.test, true);
