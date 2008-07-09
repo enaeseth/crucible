@@ -377,7 +377,7 @@ Crucible.augment(Crucible.PrettyRunner, {
 		},
 		'fail': {
 			row_class: 'pr_failed',
-			icon: 'cross.png',
+			icon: 'cross.png'
 		},
 		'error': {
 			row_class: 'pr_error',
