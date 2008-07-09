@@ -57,16 +57,14 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 	
 	testSucceeded: function pr_test_succeeded(test) {
 		this._test_msg.setType('pass');
-		this._test_msg.setMessage('Test &ldquo;' + test.name + '&rdquo; ' +
-			'passed.');
+		this._test_msg.setMessage(test.name);
 		this.tallies.pass++;
 		this._test_msg = null;
 	},
 	
 	testFailed: function pr_test_failed(test, failure) {
 		this._test_msg.setType('fail');
-		this._test_msg.setMessage('Test &ldquo;' + test.name + '&rdquo; ' +
-			'<b>failed</b>: ' + failure.description);
+		this._test_msg.setMessage(test.name + ': ' + failure.description);
 		if (this.status == 'ok')
 			this.setStatus('failure');
 		this.tallies.fail++;
