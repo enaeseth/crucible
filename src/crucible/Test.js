@@ -173,7 +173,7 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 	
 	forked: function forked() {
 		throw new Crucible.AsyncCompletion();
-	}
+	},
 	
 	promptUser: function prompt_user(message, on_accept, label, expected) {
 		var buttons = {};

@@ -96,6 +96,10 @@ Crucible.augment(Crucible.Runner.prototype,
 		this.next_test();
 	},
 	
+	displayMessage: function runner_display_message(message, buttons) {
+		throw new Error('The base Crucible.Runner cannot display messages.');
+	},
+	
 	// listeners
 	started: Crucible.emptyFunction,
 	fixtureOpened: Crucible.emptyFunction,
