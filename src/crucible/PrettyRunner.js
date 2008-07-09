@@ -182,6 +182,17 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 			},
 			
 			setButtons: function set_pr_message_buttons(buttons) {
+				function click_listener(button) {
+					return function (ev) {
+						if (typeof(button.pr_action) == 'function')
+							button.pr_action.call(null);
+						else
+							button.pr_action.run(runner);
+						mo.remove();
+						ev.preventDefault();
+					};
+				}
+				
 				message_cell.colSpan = (buttons) ? 1 : 2;
 				
 				if (!buttons && button_cell) {
@@ -201,14 +212,8 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 						button.href = '#';
 						button.innerHTML = label;
 						button.pr_action = buttons[label];
-						Crucible.observeEvent(button, 'click', function (ev) {
-							if (typeof(button.pr_action) == 'function')
-								button.pr_action.call(null);
-							else
-								button.pr_action.run(runner);
-							mo.remove();
-							ev.preventDefault();
-						});
+						Crucible.observeEvent(button, 'click', 
+							click_listener(button));
 						button_cell.appendChild(button);
 					}
 				}

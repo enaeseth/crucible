@@ -226,7 +226,7 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 			expected || null);
 		buttons[labels[1]] = new Crucible.Test.Unit(this.test, fail);
 		
-		this.runner.displayMessage(message, buttons);
+		this.runner.displayMessage(question, buttons);
 		throw new Crucible.AsyncCompletion();
 	}
 });
