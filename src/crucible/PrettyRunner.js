@@ -19,6 +19,10 @@ Crucible.PrettyRunner.prototype = new Crucible.Runner();
 Crucible.augment(Crucible.PrettyRunner.prototype,
 	/** @lends Crucible.PrettyRunner.prototype */
 {
+	doneAdding: function done_adding_tasks_to_pretty_runner() {
+		
+	},
+	
 	/**
 	 * @type Boolean
 	 * @private
@@ -65,6 +69,54 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 	 * @private
 	 */
 	results: null,
+	
+	addMessage: function add_message_to_table(type, message, buttons) {
+		var doc, params, row, icon_cell, icon, message_cell, button_cell;
+		var label, button;
+		if (!this.results)
+			this.createResultTable();
+			
+		if (!(params = Crucible.PrettyRunner._type_params[type])) // assignment
+			throw new Error('Unknown message type "' + type + '".');
+		
+		doc = this.results.ownerDocument;
+		row = this.results.insertRow(-1);
+		row.className = params.row_class;
+		
+		icon_cell = row.insertCell(-1);
+		icon_cell.className = 'pr_result_icon';
+		icon = doc.createElement('IMG');
+		icon.src = this.base + 'assets/icons/' + params.icon;
+		icon_cell.appendChild(icon);
+		
+		message_cell = row.insertCell(-1);
+		message_cell.className = 'pr_result_body';
+		message_cell.innerHTML = message;
+		message_cell.colSpan = (buttons) ? 1 : 2;
+		
+		if (buttons) {
+			button_cell = row.insertCell(-1);
+			button_cell.className = 'pr_result_buttons';
+			
+			for (var label in buttons) {
+				button = doc.createElement('A');
+				button.href = '#';
+				button.innerHTML = label;
+				button.pr_action = buttons[label];
+				Crucible.observeEvent(button, 'click', function (ev) {
+					if (typeof(button.pr_action) == 'function')
+						button.pr_action.call(null);
+					else
+						button.pr_action.run();
+					ev.preventDefault();
+				});
+				button_cell.appendChild(button);
+			}
+		}
+		
+		row.scrollIntoView();
+		return row;
+	},
 	
 	/**
 	 * Sets the status icon.
@@ -119,6 +171,9 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 	 * @return {void}
 	 */
 	appendUI: function append_pretty_runner_ui() {
+		if (this.root && this.titlebar && this.status_icon && this.body)
+			return; // guard
+		
 		this.root = document.createElement('DIV');
 		this.root.id = "pretty_runner";
 		
@@ -147,6 +202,17 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		this.root.appendChild(this.body);
 		
 		document.body.appendChild(this.root);
+	},
+	
+	/**
+	 * Creates the results table.
+	 * @private
+	 * @return {void}
+	 */
+	createResultTable: function create_pretty_runner_result_table() {
+		this.results = this.root.ownerDocument.createElement('TABLE');
+		this.results.id = "pretty_runner_results";
+		this.body.appendChild(this.results);
 	}
 });
 
@@ -166,6 +232,29 @@ Crucible.augment(Crucible.PrettyRunner, {
 			pending[i].draw();
 		}
 		pending = [];
+	},
+	
+	_type_params: {
+		'prompt': {
+			row_class: 'pr_message',
+			icon: 'bullet_go.png'
+		},
+		'running': {
+			row_class: 'pr_running',
+			icon: 'bullet_yellow.png'
+		},
+		'pass': {
+			row_class: 'pr_passed',
+			icon: 'tick.png'
+		},
+		'fail': {
+			row_class: 'pr_failed',
+			icon: 'cross.png',
+		},
+		'error': {
+			row_class: 'pr_error',
+			icon: 'exclamation.png'
+		}
 	}
 });
 

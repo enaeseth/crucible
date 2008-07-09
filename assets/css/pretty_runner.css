@@ -35,10 +35,13 @@ div#pretty_runner {
 	border: 5px solid #333;
 	border-top: none;
 	border-bottom: none;
+	display: none;
+	position: relative;
 }
 
 #pretty_runner #pretty_runner_body.pr_active {
 	height: 144px;
+	display: block;
 	overflow: auto;
 	background: transparent;
 }
@@ -47,7 +50,7 @@ div#pretty_runner {
 	width: 100%;
 	background: #222;
 	font-size: 13px;
-	margin-top: 119px;
+	/*margin-top: 119px;*/
 	border-spacing: 0;
 }
 
