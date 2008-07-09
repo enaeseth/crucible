@@ -82,7 +82,7 @@ Crucible.augment(Crucible.Runner.prototype,
 			this.task_index++;
 		}
 		
-		run_test.call(this, test);
+		Crucible.defer(run_test, this, test);
 	},
 	
 	report: function report_result_to_runner(test, result) {

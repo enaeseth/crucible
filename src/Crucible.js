@@ -122,7 +122,10 @@ var Crucible = {
 	},
 	
 	defer: function defer_function(function_, thisp) {
-		return Crucible.delay(function_, 0.01, thisp || null);
+		var args = [function_, 0.01, thisp || null], i;
+		for (i = 2; i < arguments.length; i++)
+			args.push(arguments[i]);
+		return Crucible.delay.apply(Crucible, args);
 	},
 	
 	addStyleSheet: function add_style_sheet(path) {

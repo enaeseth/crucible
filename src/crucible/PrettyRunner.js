@@ -38,7 +38,6 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		}
 		
 		function start() {
-			msg.remove();
 			this.tallies = {pass: 0, fail: 0, error: 0};
 			this.run();
 		}
@@ -208,7 +207,8 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 							if (typeof(button.pr_action) == 'function')
 								button.pr_action.call(null);
 							else
-								button.pr_action.run();
+								button.pr_action.run(runner);
+							mo.remove();
 							ev.preventDefault();
 						});
 						button_cell.appendChild(button);
@@ -388,4 +388,3 @@ Crucible.augment(Crucible.PrettyRunner, {
 });
 
 Crucible.observeEvent(window, 'load', Crucible.PrettyRunner._window_load);
-
