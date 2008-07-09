@@ -56,7 +56,7 @@ Crucible.augment(Crucible.Runner.prototype,
 		}
 		
 		task = this.tasks[this.task_index];
-		if (this.fixture_test_index >= task.tests.length) {
+		if (task.tests && this.fixture_test_index >= task.tests.length) {
 			task.tearDown();
 			this.fixtureClosed(task);
 			this.task_index++;

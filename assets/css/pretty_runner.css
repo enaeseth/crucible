@@ -55,7 +55,7 @@ div#pretty_runner {
 }
 
 table#pretty_runner_results tr {
-	border-top: 1px solid #444;
+	border-bottom: 1px solid #444;
 }
 
 table#pretty_runner_results td {
@@ -87,4 +87,20 @@ table#pretty_runner_results td.pr_result_buttons a {
 table#pretty_runner_results td.pr_result_buttons a:hover {
 	background: #F9EFCF;
 	color: #242119;
+}
+
+table#pretty_runner_results tr.pr_passed td {
+	background: #24301D;
+}
+
+table#pretty_runner_results tr.pr_failed td {
+	background: #383821;
+}
+
+table#pretty_runner_results tr.pr_error td {
+	background: #2C1D19;
+}
+
+table#pretty_runner_results tr.pr_done td {
+	background: #16182C;
 }

@@ -6,12 +6,10 @@
  * @augments Crucible.Runner
  */
 Crucible.PrettyRunner = function PrettyRunner(product) {
-	this.product = product;
+	if (product)
+		this.product = product;
 	
-	// if (Crucible.PrettyRunner._window_loaded)
-		this.draw();
-	// else
-	// 	Crucible.PrettyRunner._pending_runners.push(this);
+	this.draw();
 };
 
 Crucible.PrettyRunner.prototype = new Crucible.Runner();
@@ -20,7 +18,62 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 	/** @lends Crucible.PrettyRunner.prototype */
 {
 	doneAdding: function done_adding_tasks_to_pretty_runner() {
+		var msg;
+		this._done_adding = true;
 		
+		if (!this.root) {
+			Crucible.defer(Crucible.bind(this.doneAdding, this));
+			return;
+		}
+		
+		function start() {
+			msg.remove();
+			this.tallies = {pass: 0, fail: 0, error: 0};
+			this.run();
+		}
+		
+		msg = this.addMessage('prompt', "Crucible is ready to test " +
+			this.product + ".", {'Start': Crucible.bind(start, this)});
+	},
+	
+	displayMessage: function pr_display_message(message, buttons) {
+		this.addMessage('prompt', message, buttons);
+	},
+	
+	testStarted: function pr_test_started(test) {
+		this._test_msg = this.addMessage('running', 'Testing &ldquo;' +
+			test.name + '&rdquo;&hellip;');
+	},
+	
+	testSucceeded: function pr_test_succeeded(test) {
+		this._test_msg.setType('pass');
+		this._test_msg.setMessage('Test &ldquo;' + test.name + '&rdquo; ' +
+			'passed.');
+		this.tallies.pass++;
+		this._test_msg = null;
+	},
+	
+	testFailed: function pr_test_failed(test, failure) {
+		this._test_msg.setType('fail');
+		this._test_msg.setMessage('Test &ldquo;' + test.name + '&rdquo; ' +
+			'<b>failed</b>: ' + failure.description);
+		this.setStatus('failure');
+		this.tallies.fail++;
+		this._test_msg = null;
+	},
+	
+	testError: function pr_test_error(test, error) {
+		this._test_msg.setType('error');
+		this._test_msg.setMessage('Test &ldquo;' + test.name + '&rdquo; had ' +
+			'an <b>error</b>: ' + error.error.toString());
+		this.setStatus('error');
+		this.tallies.error++;
+		this._test_msg = null;
+	},
+	
+	completed: function pr_run_completed() {
+		this.addMessage('done', "Crucible finished testing "
+			+ this.product + ".");
 	},
 	
 	/**
@@ -28,6 +81,24 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 	 * @private
 	 */
 	_drawn: false,
+	
+	/**
+	 * @type Boolean
+	 * @private
+	 */
+	_done_adding: false,
+	
+	/**
+	 * @type Object
+	 * @private
+	 */
+	_test_msg: null,
+	
+	/**
+	 * @type Object
+	 * @private
+	 */
+	tallies: null,
 	
 	/**
 	 * @type String
@@ -71,51 +142,79 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 	results: null,
 	
 	addMessage: function add_message_to_table(type, message, buttons) {
-		var doc, params, row, icon_cell, icon, message_cell, button_cell;
-		var label, button;
+		var doc, row, icon_cell, icon, message_cell, button_cell;
+		var mo;
+		var runner = this;
 		if (!this.results)
 			this.createResultTable();
-			
-		if (!(params = Crucible.PrettyRunner._type_params[type])) // assignment
-			throw new Error('Unknown message type "' + type + '".');
 		
 		doc = this.results.ownerDocument;
 		row = this.results.insertRow(-1);
-		row.className = params.row_class;
 		
 		icon_cell = row.insertCell(-1);
 		icon_cell.className = 'pr_result_icon';
-		icon = doc.createElement('IMG');
-		icon.src = this.base + 'assets/icons/' + params.icon;
+		icon = document.createElement('IMG');
 		icon_cell.appendChild(icon);
 		
 		message_cell = row.insertCell(-1);
 		message_cell.className = 'pr_result_body';
-		message_cell.innerHTML = message;
-		message_cell.colSpan = (buttons) ? 1 : 2;
 		
-		if (buttons) {
-			button_cell = row.insertCell(-1);
-			button_cell.className = 'pr_result_buttons';
+		mo = {
+			setType: function set_pr_message_type(type) {
+				var params;
+				if (!(params = Crucible.PrettyRunner._type_params[type]))
+					throw new Error('Unknown message type "' + type + '".');
+				row.className = params.row_class;
+				icon.src = runner.base + 'assets/icons/' + params.icon;
+			},
 			
-			for (var label in buttons) {
-				button = doc.createElement('A');
-				button.href = '#';
-				button.innerHTML = label;
-				button.pr_action = buttons[label];
-				Crucible.observeEvent(button, 'click', function (ev) {
-					if (typeof(button.pr_action) == 'function')
-						button.pr_action.call(null);
-					else
-						button.pr_action.run();
-					ev.preventDefault();
-				});
-				button_cell.appendChild(button);
+			setMessage: function set_pr_message_text(message) {
+				message_cell.innerHTML = message;
+			},
+			
+			setButtons: function set_pr_message_buttons(buttons) {
+				message_cell.colSpan = (buttons) ? 1 : 2;
+				
+				if (!buttons && button_cell) {
+					button_cell.parentNode.removeChild(button_cell);
+					button_cell = null;
+				} else if (buttons) {
+					if (button_cell) {
+						while (button_cell.firstChild)
+							button_cell.removeChild(button_cell.firstChild);
+					} else {
+						button_cell = row.insertCell(-1);
+						button_cell.className = 'pr_result_buttons';
+					}
+					
+					for (var label in buttons) {
+						button = doc.createElement('A');
+						button.href = '#';
+						button.innerHTML = label;
+						button.pr_action = buttons[label];
+						Crucible.observeEvent(button, 'click', function (ev) {
+							if (typeof(button.pr_action) == 'function')
+								button.pr_action.call(null);
+							else
+								button.pr_action.run();
+							ev.preventDefault();
+						});
+						button_cell.appendChild(button);
+					}
+				}
+			},
+			
+			remove: function remove_pr_message() {
+				runner.results.deleteRow(row.rowIndex);
 			}
-		}
+		};
+		
+		mo.setType(type);
+		mo.setMessage(message);
+		mo.setButtons(buttons);
 		
 		row.scrollIntoView();
-		return row;
+		return mo;
 	},
 	
 	/**
@@ -157,11 +256,18 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		
 		if (this._drawn)
 			return;
+		
+		if (!document.body) {
+			Crucible.defer(this.draw, this);
+			return;
+		}
+		
 		this._drawn = true;
 		
 		base = this.base = Crucible.determineBase();
 		Crucible.addStyleSheet(base + 'assets/css/pretty_runner.css');
 		
+		//this.appendUI();
 		Crucible.defer(this.appendUI, this);
 	},
 	
@@ -189,12 +295,20 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		this.root.appendChild(this.titlebar);
 		
 		Crucible.observeEvent(this.titlebar, 'click', Crucible.bind(function() {
+			var row;
+			
 			this.body.className = (!this.body.className)
 				? 'pr_active'
 				: '';
 			this.titlebar.title = (this.body.className == 'pr_active')
 				? 'Click to close.'
 				: 'Click to open.';
+			if (this.body.className == 'pr_active' && this.results) {
+				row = this.results.rows[this.results.rows.length-1];
+				Crucible.defer(function() {
+					row.scrollIntoView();
+				});
+			}
 		}, this));
 		
 		this.body = document.createElement('DIV');
@@ -223,15 +337,13 @@ Crucible.augment(Crucible.PrettyRunner, {
 	_window_load: function _pretty_runner_onload() {
 		var pending, i;
 		
-		if (Crucible.PrettyRunner._window_loaded)
-			return;
 		Crucible.PrettyRunner._window_loaded = true;
 		
 		pending = Crucible.PrettyRunner._pending_runners;
+		Crucible.PrettyRunner._pending_runners = [];
 		for (i = 0; i < pending.count; i++) {
 			pending[i].draw();
 		}
-		pending = [];
 	},
 	
 	_type_params: {
@@ -254,8 +366,13 @@ Crucible.augment(Crucible.PrettyRunner, {
 		'error': {
 			row_class: 'pr_error',
 			icon: 'exclamation.png'
+		},
+		'done': {
+			row_class: 'pr_done',
+			icon: 'flag_blue.png'
 		}
 	}
 });
 
 Crucible.observeEvent(window, 'load', Crucible.PrettyRunner._window_load);
+

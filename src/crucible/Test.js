@@ -93,9 +93,9 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 	run: function run_test_unit(runner) {
 		var ex_desc;
 		
-		if (typeof(callback) != 'function') {
-			throw new TypeError("Cannot run a test without a callback " +
-				"function to pass the results to.");
+		if (typeof(runner) != 'object' || typeof(runner.report) != 'function') {
+			throw new TypeError("Cannot run a test without a Crucible test " +
+				"runner to pass the results to.");
 		}
 		
 		this.runner = runner;
@@ -105,13 +105,13 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 				this.unit();
 			} catch (e) {
 				if (e.name == 'Crucible.Failure') {
-					return this.runner.report(this, e);
+					return this.runner.report(this.test, e);
 				} else if (e.name == 'Crucible.AsyncCompletion') {
 					return;
 				} else if (this.expected === true || this.expected == e.name) {
-					return this.runner.report(this, true);
+					return this.runner.report(this.test, true);
 				} else {
-					return this.runner.report(this,
+					return this.runner.report(this.test,
 						new Crucible.UnexpectedError(this, e));
 				}
 			}
@@ -120,12 +120,12 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 				ex_desc = (this.expected === true)
 					? "an exception"
 					: 'a "' + this.expected + '" exception';
-				return this.runner.report(this, new Crucible.Failure(this,
+				return this.runner.report(this.test, new Crucible.Failure(this,
 					"The test was expecting " + ex_desc + " to be thrown, " +
 					"but none was."));
 			}
 			
-			this.runner.report(this, true);
+			this.runner.report(this.test, true);
 		} finally {
 			this.runner = null; // cleanup
 		}

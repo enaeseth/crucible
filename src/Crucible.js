@@ -118,7 +118,7 @@ var Crucible = {
 		var args = Crucible.arrayFrom(arguments).slice(3);
 		return window.setTimeout(function delayer() {
 			return function_.apply(thisp || null, args);
-		}, timeout);
+		}, timeout * 1000);
 	},
 	
 	defer: function defer_function(function_, thisp) {
