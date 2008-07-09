@@ -1,0 +1,33 @@
+div#pretty_runner {
+	position: absolute;
+	left: 16px;
+	right: 16px;
+	bottom: 0px;
+	height: 170px;
+	background: #222;
+	border: 5px solid #333;
+	border-bottom: none;
+	
+	font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
+}
+
+#pretty_runner #pretty_runner_title {
+	background: #333;
+	border-bottom: 5px solid #333;
+	color: #F8E08D;
+	padding: 0 3px;
+	font-weight: bold;
+	
+	font-size: 13px;
+	
+	/*
+	background: transparent;
+	color: #F8E08D;
+	padding: 2px 3px;
+	font-size: 13px;
+	font-weight: bold;
+	height: 16px;
+	padding-bottom: 5px;
+	margin: 12px 12px 10px 12px;
+	border-bottom: 1px dotted rgb(85, 85, 85);*/
+}
