@@ -11,11 +11,21 @@
 <body>
 <p>PrettyRunner testing.</p>
 <div id="pretty_runner">
-	<div id="pretty_runner_title">
+	<div id="pretty_runner_title" title="Click to close.">
+		<span class="pr_status"><img src="../assets/icons/ok.png" alt="OK" /></span>
 		Crucible
 	</div>
-	
-	
+	<div id="pretty_runner_body" class="pr_active">
+		<table id="pretty_runner_results">
+			<tr class="pr_message">
+				<td class="pr_result_icon"><img src="../assets/icons/bullet_go.png"/></td>
+				<td class="pr_result_body">Crucible is ready to begin testing Loki 2.0.</td>
+				<td class="pr_result_buttons">
+					<a href="#">Start</a>
+				</td>
+			</tr>
+		</table>
+	</div>
 </div>
 </body>
 </html>
