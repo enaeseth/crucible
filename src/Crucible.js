@@ -79,3 +79,5 @@ var Crucible = {
 #include "crucible/UnexpectedError.js"
 #include "crucible/Test.js"
 #include "crucible/Fixture.js"
+#include "crucible/Runner.js"
+
