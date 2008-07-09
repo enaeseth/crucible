@@ -22,13 +22,17 @@ Crucible.augment(Crucible.Runner.prototype,
 		}
 	},
 	
+	doneAdding: function done_adding_tasks_to_runner() {
+		// default implementation does nothing
+	},
+	
 	run: function runner_run() {
 		this.task_index = 0;
 		this.started();
-		this.next_test();
+		this.nextTest();
 	},
 	
-	next_test: function runner_next_test() {
+	nextTest: function runner_next_test() {
 		var task, test;
 		
 		function run_test(test) {
@@ -93,7 +97,7 @@ Crucible.augment(Crucible.Runner.prototype,
 			throw new Error('Unable to understand test result: ' + result);
 		}
 		
-		this.next_test();
+		this.nextTest();
 	},
 	
 	displayMessage: function runner_display_message(message, buttons) {

@@ -98,7 +98,7 @@ var Crucible = {
 					}
 				}
 				
-				handler(ev);
+				handler.call(this, ev);
 			}
 			target.attachEvent(name, ie_event_wrapper);
 		} else {
