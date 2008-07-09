@@ -169,5 +169,47 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 	fail: function fail(message) {
 		throw new Crucible.Failure(this.test, message ||
 			'(unspecified reason)');
+	},
+	
+	forked: function forked() {
+		throw new Crucible.AsyncCompletion();
+	}
+	
+	promptUser: function prompt_user(message, on_accept, label, expected) {
+		var buttons = {};
+		
+		if (!message)
+			throw new Error('No message to prompt with.');
+		else if (typeof(on_accept) != 'function')
+			throw new Error('Must provide a post-accept function for prompt.');
+			
+		buttons[label || 'OK'] = new Crucible.Test.Unit(this.test, on_accept,
+			expected || null);
+		
+		this.runner.displayMessage(message, buttons);
+		throw new Crucible.AsyncCompletion();
+	},
+	
+	verify: function verify(question, on_ok, labels, description, expected) {
+		var buttons = {};
+		
+		if (!question)
+			throw new Error('No question to verify.');
+		else if (typeof(on_ok) != 'function')
+			throw new Error('Must provide something to do upon verification.');
+		
+		if (!labels)
+			labels = ['Yes', 'No'];
+			
+		function fail() {
+			this.fail(description || 'Verification failed.');
+		}
+		
+		buttons[labels[0]] = new Crucible.Test.Unit(this.test, on_ok,
+			expected || null);
+		buttons[labels[1]] = new Crucible.Test.Unit(this.test, fail);
+		
+		this.runner.displayMessage(message, buttons);
+		throw new Crucible.AsyncCompletion();
 	}
 });

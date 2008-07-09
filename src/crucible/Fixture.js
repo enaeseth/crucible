@@ -54,6 +54,4 @@ Crucible.augment(Crucible.Fixture.prototype,
 			? name
 			: new Crucible.Test(name, test, expected));
 	}
-	
-	
 });
