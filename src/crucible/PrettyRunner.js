@@ -246,11 +246,17 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		
 		mo = {
 			setType: function set_pr_message_type(type) {
-				var params;
+				var params, path;
 				if (!(params = Crucible.PrettyRunner._type_params[type]))
 					throw new Error('Unknown message type "' + type + '".');
+				path = runner.base + 'assets/icons/' + params.icon;
 				row.className = params.row_class;
-				icon.src = runner.base + 'assets/icons/' + params.icon;
+				icon.src = path;
+				if (/MSIE 6/.test(navigator.userAgent)) {
+					icon.style.filter = "progid:" +
+						"DXImageTransform.Microsoft.AlphaImageLoader(src='" +
+					    path + "', sizingMethod='image')";
+				}
 			},
 			
 			setMessage: function set_pr_message_text(message) {
