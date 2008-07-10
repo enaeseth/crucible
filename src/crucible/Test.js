@@ -163,6 +163,20 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 		}
 	},
 	
+	assertType: function assert_type(expected_type, object, message) {
+		if (typeof(object) != expected_type) {
+			throw new Crucible.Failure(this.test, message ||
+				'Object should be of type "' + expected_type + '".');
+		}
+	},
+	
+	assertDefined: function assert_defined(object, message) {
+		if (typeof(object) == 'undefined') {
+			throw new Crucible.Failure(this.test, message ||
+				'Object should not be undefined.');
+		}
+	},
+	
 	assertNull: function assert_null(object, message) {
 		if (object !== null) {
 			throw new Crucible.Failure(this.test, message ||
