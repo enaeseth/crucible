@@ -131,7 +131,7 @@ var Crucible = {
 				
 				handler.call(this, ev);
 			}
-			target.attachEvent(name, ie_event_wrapper);
+			target.attachEvent('on' + name, ie_event_wrapper);
 		} else {
 			throw new Error('No modern event API available.');
 		}
