@@ -51,7 +51,7 @@ Crucible.augment(Crucible.Fixture.prototype,
 	tearDown: Crucible.emptyFunction,
 	
 	add: function add_test_to_fixture(name, test, expected) {
-		test.push((typeof(name) == 'object')
+		this.tests.push((typeof(name) == 'object')
 			? name
 			: new Crucible.Test(name, test, expected));
 	}
@@ -97,7 +97,7 @@ Crucible.augment(Crucible.Fixture.Handler.prototype,
 			
 			Crucible.defer(function(test) {
 				Crucible.getHandler(test).run(fixture, test, runner);
-			}, null, fixture.test[cur_test]);
+			}, null, fixture.tests[cur_test]);
 			return true;
 		}
 		

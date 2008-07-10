@@ -193,6 +193,18 @@ var Crucible = {
 	},
 	
 	/**
+	 * Returns the keys (i.e., property names) of the object.
+	 * @param {Object} obj any object
+	 * @return {String[]} the object's keys
+	 */
+	objectKeys: function object_keys(obj) {
+		var keys = [];
+		for (var name in obj)
+			keys.push(name);
+		return keys;
+	},
+	
+	/**
 	 * A function that does nothing. Useful as a standin.
 	 * @return {void}
 	 */

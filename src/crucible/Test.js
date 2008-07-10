@@ -74,8 +74,10 @@ Crucible.Test.Unit = function TestUnit(test, unit, expected) {
 	this.unit = unit;
 	this.expected = expected;
 	
-	if (test.context)
+	if (test.context) {
 		Crucible.augment(this, test.context);
+		this.context_keys = Crucible.objectKeys(test.context);
+	}
 };
 
 Crucible.augment(Crucible.Test.Unit.prototype,
@@ -89,6 +91,13 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 	runner: null,
 	
 	/**
+	 * The keys of the test context object.
+	 * @protected
+	 * @type String[]
+	 */
+	context_keys: null,
+	
+	/**
 	 * Runs the test unit.
 	 * @param {Object} test runner
 	 * @throws {Crucible.Failure} if an assertion in the test fails
@@ -99,6 +108,7 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 	run: function run_test_unit(runner) {
 		var ex_desc;
 		var test = this.test;
+		var i, len, key;
 		
 		if (typeof(runner) != 'object' || typeof(runner.report) != 'function') {
 			throw new TypeError("Cannot run a test without a Crucible test " +
@@ -120,6 +130,14 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 		try {
 			try {
 				this.unit();
+				
+				if (this.context_keys) {
+					for (i = 0, len = this.context_keys.length; i < len; ++i) {
+						key = this.context_keys[i];
+						this.test.context[key] = this[key];
+						delete this[key];
+					}
+				}
 			} catch (e) {
 				if (e.name == 'Crucible.Failure') {
 					this.runner.report(this.test, e);
