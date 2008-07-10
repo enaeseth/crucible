@@ -92,7 +92,6 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 			message.setType('pass');
 			message.setMessage(test.name);
 			this.tallies.pass++;
-			console.debug('Test passed: ' + test.name);
 		},
 	
 		testFailed: function pr_test_failed(test, failure) {
@@ -102,7 +101,6 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 			if (this.status == 'ok')
 				this.setStatus('failure');
 			this.tallies.fail++;
-			console.debug('Test failed: ' + test.name);
 		},
 	
 		testError: function pr_test_error(test, error) {
@@ -112,7 +110,6 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 				'had an <b>error</b>: ' + error.error.toString());
 			this.setStatus('error');
 			this.tallies.error++;
-			console.debug('Test had an error: ' + test.name);
 		},
 	
 		completed: function pr_run_completed() {
