@@ -228,7 +228,6 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 	
 	addMessage: function add_message_to_table(type, message, buttons) {
 		var doc, row, icon_cell, icon, message_cell, button_cell;
-		var ie6 = /MSIE 6/.test(navigator.userAgent);
 		var mo;
 		var runner = this;
 		if (!this.results)
@@ -239,20 +238,11 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		
 		icon_cell = row.insertCell(-1);
 		icon_cell.className = 'pr_result_icon';
+		icon = Crucible.PrettyRunner._create_icon(doc);
+		icon_cell.appendChild(icon);
 		
 		function set_icon(path) {
-			if (!icon) {
-				icon = doc.createElement((ie6) ? 'SPAN' : 'IMG');
-				icon_cell.appendChild(icon);
-			}
-			
-			if (ie6) {
-				icon.style.filter = "progid:" +
-					"DXImageTransform.Microsoft.AlphaImageLoader(src='" +
-				    path + "', sizingMethod='image')";
-			} else {
-				icon.src = path;
-			}
+			Crucible.PrettyRunner._update_icon(icon, path);
 		}
 		
 		message_cell = row.insertCell(-1);
@@ -339,20 +329,18 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		var base = this.base + 'assets/icons/';
 		switch (status) {
 			case 'ok':
-				this.status_icon.src = base + 'ok.png';
-				this.status_icon.alt = 'OK';
-				this.status_icon.title = 'No errors.';
+				Crucible.PrettyRunner._update_icon(this.status_icon,
+					base + 'ok.png', 'OK', 'No errors.');
 				break;
 			case 'failure':
-				this.status_icon.src = base + 'error.png';
-				this.status_icon.alt = 'Failure(s)';
-				this.status_icon.title = 'One or more tests have failed.';
+				Crucible.PrettyRunner._update_icon(this.status_icon,
+					base + 'error.png', 'Failure(s)',
+					'One or more tests have failed.');
 				break;
 			case 'error':
-				this.status_icon.src = base + 'exclamation.png';
-				this.status_icon.alt = 'Error(s)';
-				this.status_icon.title = 'One or more tests have encountered ' +
-					'errors.';
+				Crucible.PrettyRunner._update_icon(this.status_icon,
+					base + 'exclamation.png', 'Error(s)',
+					'One or more tests have encountered errors.');
 				break;
 			default:
 				throw new Error('Unknown runner status code "' + status + '".');
@@ -401,7 +389,7 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		this.titlebar.id = "pretty_runner_title";
 		this.titlebar.title = 'Click to open.';
 		
-		this.status_icon = document.createElement('IMG');
+		this.status_icon = Crucible.PrettyRunner._create_icon(document);
 		this.status_icon.className = 'pr_status';
 		this.setStatus('ok');
 		this.titlebar.appendChild(this.status_icon)
@@ -488,5 +476,30 @@ Crucible.augment(Crucible.PrettyRunner, {
 		}
 	}
 });
+
+Crucible.PrettyRunner.IE6 = /MSIE 6/.test(navigator.userAgent);
+
+/** @ignore */
+Crucible.PrettyRunner._create_icon = function _pr_create_icon(doc) {
+	var tag = (Crucible.PrettyRunner.IE6) ? 'SPAN' : 'IMG';
+	return (doc || document).createElement(tag);
+};
+
+Crucible.PrettyRunner._update_icon =
+	function _pr_update_icon(icon, path, alt, title) 
+{
+	if (Crucible.PrettyRunner.IE6) {
+		icon.style.filter = "progid:" +
+			"DXImageTransform.Microsoft.AlphaImageLoader(src='" +
+		    path + "', sizingMethod='image')";
+	} else {
+		icon.src = path;
+		if (typeof(alt) != 'undefined')
+			icon.alt = alt;
+	}
+	
+	if (typeof(title) != 'undefined')
+		icon.title = title;
+};
 
 Crucible.observeEvent(window, 'load', Crucible.PrettyRunner._window_load);

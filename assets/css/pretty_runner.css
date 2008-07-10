@@ -8,7 +8,6 @@ div#pretty_runner {
 	overflow: hidden;
 	
 	font-family: "Lucida Grande", "Lucida Sans Unicode", Arial, sans-serif;
-	z-index: 4;
 }
 
 #pretty_runner #pretty_runner_title {
@@ -19,7 +18,6 @@ div#pretty_runner {
 	
 	font-size: 13px;
 	height: 16px;
-	z-index: 2;
 	cursor: pointer;
 }
 
@@ -29,6 +27,12 @@ div#pretty_runner {
 
 #pretty_runner #pretty_runner_title .pr_status {
 	float: right;
+}
+
+#pretty_runner #pretty_runner_title span.pr_status {
+	width: 16px;
+	height: 16px;
+	display: inline-block;
 }
 
 #pretty_runner #pretty_runner_body {
