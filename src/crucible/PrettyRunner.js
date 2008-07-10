@@ -211,6 +211,7 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 			},
 			
 			setMessage: function set_pr_message_text(message) {
+				message_cell.innerHTML = '';
 				message_cell.innerHTML = message;
 			},
 			
