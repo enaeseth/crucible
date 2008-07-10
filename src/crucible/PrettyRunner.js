@@ -253,6 +253,7 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 				row.className = params.row_class;
 				icon.src = path;
 				if (/MSIE 6/.test(navigator.userAgent)) {
+					icon.style.display = 'inline-block';
 					icon.style.filter = "progid:" +
 						"DXImageTransform.Microsoft.AlphaImageLoader(src='" +
 					    path + "', sizingMethod='image')";
