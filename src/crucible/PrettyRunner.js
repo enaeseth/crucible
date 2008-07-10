@@ -303,7 +303,8 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 			},
 			
 			remove: function remove_pr_message() {
-				runner.results.deleteRow(row.rowIndex);
+				row.parentNode.removeChild(row);
+				row = null;
 			}
 		};
 		
