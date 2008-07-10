@@ -113,8 +113,47 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		},
 	
 		completed: function pr_run_completed() {
-			this.addMessage('done', "Crucible has finished testing "
-				+ this.product + ".");
+			var doc = this.body.ownerDocument;
+			var frag = doc.createDocumentFragment();
+			var message = doc.createElement('P');
+			var tally_table = doc.createElement('TABLE');
+			var tallies = this.tallies;
+			var total_tests = tallies.pass + tallies.fail + tallies.error;
+			tally_table.id = "pr_tally";
+			
+			function round(number) {
+				return String(number).match(/\d+(\.\d)?/)[0];
+			}
+			
+			function make_row(title, count) {
+				var row = doc.createElement('TR');
+				var head = doc.createElement('TH');
+				var number;
+				var percent;
+				head.appendChild(doc.createTextNode(title));
+				row.appendChild(head);
+				
+				number = doc.createElement('TD');
+				number.innerHTML = count + ' tests';
+				row.appendChild(number);
+				
+				percent = doc.createElement('TD');
+				percent.innerHTML =  '(' + round(100 * (count / total_tests)) +
+					'%)';
+				row.appendChild(percent);
+				tally_table.appendChild(row);
+			}
+			
+			message.innerHTML = "Crucible has finished testing "
+				+ this.product + "."
+			frag.appendChild(message);
+			
+			make_row('Passed:', tallies.pass);
+			make_row('Failed:', tallies.fail);
+			make_row('Errors:', tallies.error);
+			frag.appendChild(tally_table);
+			
+			this.addMessage('done', frag);
 		}
 	},
 	
@@ -211,8 +250,13 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 			},
 			
 			setMessage: function set_pr_message_text(message) {
-				message_cell.innerHTML = '';
-				message_cell.innerHTML = message;
+				if (typeof(message) == 'string') {
+					message_cell.innerHTML = message;
+				} else {
+					while (message_cell.firstChild)
+						message_cell.removeChild(message_cell.firstChild);
+					message_cell.appendChild(message);
+				}
 			},
 			
 			setButtons: function set_pr_message_buttons(buttons) {

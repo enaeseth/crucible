@@ -64,9 +64,6 @@ table#pretty_runner_results td {
 
 table#pretty_runner_results td.pr_result_icon {
 	width: 16px;
-}
-
-table#pretty_runner_results td.pr_result_icon img {
 	vertical-align: top;
 }
 
@@ -101,4 +98,32 @@ table#pretty_runner_results tr.pr_error td {
 
 table#pretty_runner_results tr.pr_done td {
 	background: #16182C;
+}
+
+table#pretty_runner_results p {
+	margin: 0;
+}
+
+table#pretty_runner_results table#pr_tally {
+	border-spacing: 0;
+	margin: 0.4em 0 0 1em;
+	background: #222536;
+}
+
+table#pretty_runner_results table#pr_tally td,
+	table#pretty_runner_results table#pr_tally th
+{
+	padding: 3px 4px;
+}
+
+table#pretty_runner_results table#pr_tally th {
+	text-align: left;
+	margin: 0;
+	padding-right: 0.5em;
+}
+
+table#pretty_runner_results table#pr_tally td {
+	margin: 0;
+	border: none;
+	background: #222536;
 }
