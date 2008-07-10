@@ -6,6 +6,7 @@
  * @augments Crucible.Runner
  */
 Crucible.PrettyRunner = function PrettyRunner(product) {
+	Crucible.Runner.call(this);
 	if (product)
 		this.product = product;
 	

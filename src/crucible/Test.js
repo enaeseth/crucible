@@ -51,14 +51,17 @@ Crucible.augment(Crucible.Test.prototype,
 	
 	/**
 	 * Runs the test.
-	 * @param {Object} test runner
+	 * @param {Object} runner test runner
+	 * @param {Object} [context] test context
 	 * @throws {Crucible.Failure} if an assertion in the test fails
 	 * @throws {Crucible.UnexpectedError} if the test code generates an
 	 *         unexpected exception
 	 * @return {void}
 	 */
-	run: function run_test(runner) {
-		var unit = new Crucible.Test.Unit(this, this.test, this.expected);
+	run: function test_run(runner, context) {
+		var unit;
+		this.context = context || null;
+		unit = new Crucible.Test.Unit(this, this.test, this.expected);
 		unit.run(runner);
 	}
 });
@@ -70,6 +73,9 @@ Crucible.Test.Unit = function TestUnit(test, unit, expected) {
 	this.test = test;
 	this.unit = unit;
 	this.expected = expected;
+	
+	if (test.context)
+		Crucible.augment(this, test.context);
 };
 
 Crucible.augment(Crucible.Test.Unit.prototype,
@@ -228,5 +234,37 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 		
 		this.runner.displayMessage(question, buttons);
 		throw new Crucible.AsyncCompletion();
+	}
+});
+
+/**
+ * Constructs a new TestHandler.
+ * @class Source handler for Crucible tests.
+ */
+Crucible.Test.Handler = function TestHandler() {
+	
+};
+
+Crucible.Test.Handler.prototype = new Crucible.SourceHandler(Crucible.Test);
+Crucible.augment(Crucible.Test.Handler.prototype,
+	/** @lends Crucible.Test.Handler.prototype */
+{
+	getTests: function get_tests_from_test(test) {
+		return [test];
+	},
+	
+	run: function run_test(parent, test, runner) {
+		runner.sourceOpened.call(parent, test);
+		
+		function test_finished(finished_test) {
+			if (finished_test == test) {
+				runner.testFinished.remove(test_finished, test);
+				runner.sourceClosed.call(parent, test);
+			}
+		}
+		
+		runner.testFinished.add(test_finished, test);
+		
+		test.run(runner, (parent && parent.testContext) || null);
 	}
 });

@@ -55,3 +55,64 @@ Crucible.augment(Crucible.Fixture.prototype,
 			: new Crucible.Test(name, test, expected));
 	}
 });
+
+/**
+ * Constructs a new FixtureHandler.
+ * @class Source handler for Crucible fixtures.
+ */
+Crucible.Fixture.Handler = function FixtureHandler() {
+	
+};
+
+Crucible.Fixture.Handler.prototype =
+	new Crucible.SourceHandler(Crucible.Fixture);
+Crucible.augment(Crucible.Fixture.Handler.prototype,
+	/** @lends Crucible.Fixture.Handler.prototype */
+{
+	getTests: function get_tests_from_fixture(fixture) {
+		return fixture.tests;
+	},
+	
+	run: function run_fixture(parent, fixture, runner) {
+		var cur_test = -1;
+		
+		runner.sourceOpened.call(parent, fixture);
+		
+		if (fixture.tests.length == 0) {
+			runner.sourceClosed.call(parent, fixture);
+			return;
+		}
+		
+		fixture.testContext = {};
+		fixture.initialize.call(fixture.testContext);
+		
+		function next_test() {
+			cur_test++;
+			if (cur_test >= fixture.tests.length) {
+				return false;
+			}
+			
+			fixture.setUp.call(fixture.testContext);
+			
+			Crucible.defer(function(test) {
+				Crucible.getHandler(test).run(fixture, test, runner);
+			}, null, fixture.test[cur_test]);
+			return true;
+		}
+		
+		function source_closed(source_parent, closed_source) {
+			if (closed_source == fixture.tests[cur_test]) {
+				fixture.tearDown.call(fixture.testContext);
+				
+				if (!next_test()) {
+					fixture.uninitialize.call(fixture.testContext);
+					runner.sourceClosed.remove(source_closed, fixture);
+					runner.sourceClosed.call(parent, fixture);
+				}
+			}
+		}
+		runner.sourceClosed.add(source_closed, fixture);
+		
+		next_test();
+	}
+});

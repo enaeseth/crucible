@@ -1,117 +1,79 @@
 /**
+ * Creates a new runner, setting up delegators for each possible event.
  * @class Abstract class; skeleton of a runner for Crucible tests.
  */
 Crucible.Runner = function Runner() {
-	
+	var i, length, ev;
+	for (i = 0, length = Crucible.Runner.events.length; i < length; i++) {
+		ev = Crucible.Runner.events[i];
+		this[ev] = new Crucible.Delegator(ev);
+	}
 };
 
 Crucible.augment(Crucible.Runner.prototype,
 	/** @lends Crucible.Runner.prototype */
 {
-	tasks: [],
-	task_index: null,
-	fixture_test_index: null,
+	sources: [],
+	source_index: null,
 	current_test: null,
 	
-	add: function add_task_to_runner(task) {
-		if (task.run || (task.tests && task.setUp)) {
-			this.tasks.push(task);
-		} else {
-			throw new TypeError('Only tests or test fixtures can be added to ' +
-				'a runner.');
-		}
+	add: function add_test_source_to_runner(source) {
+		this.sources.push(source);
 	},
 	
-	doneAdding: function done_adding_tasks_to_runner() {
+	doneAdding: function done_adding_sources_to_runner() {
 		// default implementation does nothing
 	},
 	
 	run: function runner_run() {
-		this.task_index = 0;
-		this.started();
-		this.nextTest();
+		this.sourceClosed.add(this._sourceClosed, this);
+		
+		this.started.call();
+		this.runSource(0);
 	},
 	
-	nextTest: function runner_next_test() {
-		var task, test;
-		
-		function run_test(test) {
-			this.testStarted(test);
-			this.current_test = test;
-			test.run(this);
+	_sourceClosed: function _runner_source_closed(source) {
+		if (source == this.sources[this.source_index]) {
+			this.runSource(this.source_index + 1);
 		}
-		
-		function finish() {
-			this.task_index = null;
-			this.completed();
-		}
-		
-		this.current_test = null;
-		if (this.task_index === null) {
-			throw new Error("Runner is in an invalid state; cannot proceed " +
-				"to next test.");
-		} else if (this.task_index >= this.tasks.length) {
-			finish.call(this);
+	},
+	
+	finish: function runner_cleanup() {
+		this.sourceClosed.remove(this._sourceClosed, this);
+		this.completed.call();
+		this.source_index = null;
+	},
+	
+	runSource: function runner_run_source(index) {
+		this.source_index = index;
+		if (this.source_index >= this.sources.length) {
+			this.finish();
 			return;
 		}
 		
-		task = this.tasks[this.task_index];
-		if (task.tests && this.fixture_test_index >= task.tests.length) {
-			task.tearDown();
-			this.fixtureClosed(task);
-			this.task_index++;
-			
-			if (this.task_index >= this.tasks.length) {
-				finish.call(this);
-				return;
-			} else {
-				task = this.tasks[this.task_index];
-			}
-		}
-		
-		if (!task.run && task.tests && task.setUp) {
-			if (this.fixture_test_index === null) {
-				this.fixture_test_index = 0;
-				task.initialize();
-				this.fixtureOpened(task);
-			}
-			
-			test = task.tests[this.fixture_test_index++];
-		} else {
-			test = task;
-			this.task_index++;
-		}
-		
-		Crucible.defer(run_test, this, test);
+		Crucible.getHandler(this.sources[index]).run(null, this.sources[index],
+			this);
 	},
 	
 	report: function report_result_to_runner(test, result) {
-		this.testFinished(test, result);
+		this.testFinished.call(test, result);
 		if (result === true) {
-			this.testSucceeded(test);
+			this.testSucceeded.call(test);
 		} else if (result.name == 'Crucible.Failure') {
-			this.testFailed(test, result);
+			this.testFailed.call(test, result);
 		} else if (result.name == 'Crucible.UnexpectedError') {
-			this.testError(test, result);
+			this.testError.call(test, result);
 		} else {
 			throw new Error('Unable to understand test result: ' + result);
 		}
-		
-		this.nextTest();
 	},
 	
 	displayMessage: function runner_display_message(message, buttons) {
 		throw new Error('The base Crucible.Runner cannot display messages.');
-	},
-	
-	// listeners
-	started: Crucible.emptyFunction,
-	fixtureOpened: Crucible.emptyFunction,
-	testStarted: Crucible.emptyFunction,
-	testFinished: Crucible.emptyFunction,
-	testSucceeded: Crucible.emptyFunction,
-	testFailed: Crucible.emptyFunction,
-	testError: Crucible.emptyFunction,
-	fixtureClosed: Crucible.emptyFunction,
-	completed: Crucible.emptyFunction
+	}
 });
+
+/** @ignore */
+Crucible.Runner.events = ['started', 'sourceOpened', 'testStarted',
+	'testFinished', 'testSucceeded', 'testFailed', 'testError',
+	'sourceClosed', 'completed'];

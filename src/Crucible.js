@@ -6,13 +6,44 @@ var Crucible = {
 	 * The version of Crucible in use.
 	 * @type String
 	 */
-	version: '0.0.1',
+	version: '0.0.2',
 	
 	/**
 	 * The Crucible base URI. Normally autodetected.
-	 * @type string
+	 * @type String
 	 */
 	base: null,
+	
+	/**
+	 * All registered Crucible test source handlers.
+	 * @type Crucible.SourceHandler[]
+	 */
+	handlers: [],
+	
+	/**
+	 * Registers a new source handler with Crucible.
+	 * @param {Crucible.SourceHandler} handler the new handler
+	 * @return {void}
+	 */
+	addSourceHandler: function add_source_handler(handler) {
+		Crucible.handlers.push(handler);
+	},
+	
+	/**
+	 * Gets the proper handler for the source.
+	 * @param {Object} source the test source
+	 * @return {Crucible.SourceHandler} the source's handler
+	 * @throws {Error} if no handler could be found
+	 */
+	getHandler: function get_source_handler(source) {
+		var i, len;
+		for (i = 0, len = handlers.length; i < len; ++i) {
+			if (handlers[i].handles(source))
+				return handlers[i];
+		}
+		
+		throw new Error('No source handler accepted the given source.');
+	},
 	
 	/**
 	 * Copies all properties from the source object to the destination.
@@ -182,6 +213,8 @@ var Crucible = {
 #include "crucible/Failure.js"
 #include "crucible/AsyncCompletion.js"
 #include "crucible/UnexpectedError.js"
+#include "crucible/Delegator.js"
+#include "crucible/SourceHandler.js"
 #include "crucible/Test.js"
 #include "crucible/Fixture.js"
 #include "crucible/Runner.js"
