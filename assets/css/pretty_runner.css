@@ -55,7 +55,7 @@ div#pretty_runner {
 }
 
 table#pretty_runner_results td {
-	height: 16px;
+	line-height: 16px;
 	border: none;
 	border-bottom: 1px solid #333;
 	padding: 4px;
@@ -113,6 +113,7 @@ table#pretty_runner_results table#pr_tally {
 table#pretty_runner_results table#pr_tally td,
 	table#pretty_runner_results table#pr_tally th
 {
+	line-height: auto;
 	padding: 3px 4px;
 }
 
