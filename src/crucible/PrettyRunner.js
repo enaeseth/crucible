@@ -376,6 +376,7 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 	createResultTable: function create_pretty_runner_result_table() {
 		this.results = this.root.ownerDocument.createElement('TABLE');
 		this.results.id = "pretty_runner_results";
+		this.results.cellSpacing = 0;
 		this.body.appendChild(this.results);
 	}
 });
