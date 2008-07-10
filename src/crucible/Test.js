@@ -70,13 +70,13 @@ Crucible.augment(Crucible.Test.prototype,
  * @class One contigiously-executing block of a test.
  */
 Crucible.Test.Unit = function TestUnit(test, unit, expected) {
-	this.test = test;
-	this.unit = unit;
-	this.expected = expected;
+	this._test = test;
+	this._unit = unit;
+	this._expected = expected;
 	
 	if (test.context) {
 		Crucible.augment(this, test.context);
-		this.context_keys = Crucible.objectKeys(test.context);
+		this._context_keys = Crucible.objectKeys(test.context);
 	}
 };
 
@@ -88,14 +88,14 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 	 * @protected
 	 * @type Object
 	 */
-	runner: null,
+	_runner: null,
 	
 	/**
 	 * The keys of the test context object.
 	 * @protected
 	 * @type String[]
 	 */
-	context_keys: null,
+	_context_keys: null,
 	
 	/**
 	 * Runs the test unit.
@@ -107,7 +107,7 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 	 */
 	run: function run_test_unit(runner) {
 		var ex_desc;
-		var test = this.test;
+		var test = this._test;
 		var i, len, key;
 		
 		if (typeof(runner) != 'object' || typeof(runner.report) != 'function') {
@@ -115,42 +115,42 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 				"runner to pass the results to.");
 		}
 		
-		this.runner = runner;
+		this._runner = runner;
 		
 		function pass() {
-			this.runner.report(test, true);
+			runner.report(test, true);
 		}
 		function fail(message) {
-			this.runner.report(test, new Crucible.Failure(test, message));
+			runner.report(test, new Crucible.Failure(test, message));
 		}
 		function unexpected_error(error) {
-			this.runner.report(test, new Crucible.UnexpectedError(test, error));
+			runner.report(test, new Crucible.UnexpectedError(test, error));
 		}
 		
 		try {
 			try {
-				this.unit();
+				this._unit();
 				
-				if (this.context_keys) {
-					for (i = 0, len = this.context_keys.length; i < len; ++i) {
-						key = this.context_keys[i];
-						this.test.context[key] = this[key];
+				if (this._context_keys) {
+					for (i = 0, len = this._context_keys.length; i < len; ++i) {
+						key = this._context_keys[i];
+						this._test.context[key] = this[key];
 						delete this[key];
 					}
 				}
 			} catch (e) {
 				if (e.name == 'Crucible.Failure') {
-					this.runner.report(this.test, e);
+					this._runner.report(this._test, e);
 					return;
 				} else if (e.name == 'Crucible.AsyncCompletion') {
 					return;
-				} else if (this.expected) {
-					if (this.expected === true) {
+				} else if (this._expected) {
+					if (this._expected === true) {
 						pass();
-					} else if (this.expected == e.name) {
+					} else if (this._expected == e.name) {
 						pass();
 					} else {
-						fail('Expected a "' + this.expected + '" exception, ' +
+						fail('Expected a "' + this._expected + '" exception, ' +
 							'but the test threw ' + e.toString() + ' instead.');
 					}
 					return;
@@ -159,72 +159,72 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 				}
 			}
 	
-			if (this.expected) {
-				ex_desc = (this.expected === true)
+			if (this._expected) {
+				ex_desc = (this._expected === true)
 					? "an exception"
-					: 'a "' + this.expected + '" exception';
+					: 'a "' + this._expected + '" exception';
 				fail("Expected " + ex_desc + ' to be thrown, but none ' +
 					'was.');
 				return;
 			}
 			
-			this.runner.report(this.test, true);
+			this._runner.report(this._test, true);
 		} finally {
-			this.runner = null; // cleanup
+			this._runner = null; // cleanup
 		}
 	},
 	
 	assertEqual: function assert_equal(expected, actual, message) {
 		if (!Crucible.equal(expected, actual)) {
-			throw new Crucible.Failure(this.test, message ||
+			throw new Crucible.Failure(this._test, message ||
 				'Expected ' + expected + ' but got ' + actual + '.');
 		}
 	},
 	
 	assertType: function assert_type(expected_type, object, message) {
 		if (typeof(object) != expected_type) {
-			throw new Crucible.Failure(this.test, message ||
+			throw new Crucible.Failure(this._test, message ||
 				'Object should be of type "' + expected_type + '".');
 		}
 	},
 	
 	assertDefined: function assert_defined(object, message) {
 		if (typeof(object) == 'undefined') {
-			throw new Crucible.Failure(this.test, message ||
+			throw new Crucible.Failure(this._test, message ||
 				'Object should not be undefined.');
 		}
 	},
 	
 	assertNull: function assert_null(object, message) {
 		if (object !== null) {
-			throw new Crucible.Failure(this.test, message ||
+			throw new Crucible.Failure(this._test, message ||
 				'Object should be null.');
 		}
 	},
 	
 	assertNotNull: function assert_not_null(object, message) {
 		if (object === null || typeof(object) == 'undefined') {
-			throw new Crucible.Failure(this.test, message ||
+			throw new Crucible.Failure(this._test, message ||
 				'Object should not be null.');
 		}
 	},
 	
 	assert: function assert(condition, message) {
 		if (!condition) {
-			throw new Crucible.Failure(this.test, message ||
+			throw new Crucible.Failure(this._test, message ||
 				'(unspecified reason)');
 		}
 	},
 	
 	assertFalse: function assert_false(condition, message) {
 		if (condition) {
-			throw new Crucible.Failure(this.test, message ||
+			throw new Crucible.Failure(this._test, message ||
 				'(unspecified reason)');
 		}
 	},
 	
 	fail: function fail(message) {
-		throw new Crucible.Failure(this.test, message ||
+		throw new Crucible.Failure(this._test, message ||
 			'(unspecified reason)');
 	},
 	
@@ -240,10 +240,10 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 		else if (typeof(on_accept) != 'function')
 			throw new Error('Must provide a post-accept function for prompt.');
 			
-		buttons[label || 'OK'] = new Crucible.Test.Unit(this.test, on_accept,
+		buttons[label || 'OK'] = new Crucible.Test.Unit(this._test, on_accept,
 			expected || null);
 		
-		this.runner.displayMessage(message, buttons);
+		this._runner.displayMessage(message, buttons);
 		throw new Crucible.AsyncCompletion();
 	},
 	
@@ -259,14 +259,14 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 			labels = ['Yes', 'No'];
 			
 		function fail() {
-			this.fail(description || 'Verification failed.');
+			this._fail(description || 'Verification failed.');
 		}
 		
-		buttons[labels[0]] = new Crucible.Test.Unit(this.test, on_ok,
+		buttons[labels[0]] = new Crucible.Test.Unit(this._test, on_ok,
 			expected || null);
-		buttons[labels[1]] = new Crucible.Test.Unit(this.test, fail);
+		buttons[labels[1]] = new Crucible.Test.Unit(this._test, fail);
 		
-		this.runner.displayMessage(question, buttons);
+		this._runner.displayMessage(question, buttons);
 		throw new Crucible.AsyncCompletion();
 	}
 });
