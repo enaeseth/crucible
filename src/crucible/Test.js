@@ -129,13 +129,17 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 		
 		try {
 			try {
-				this._unit();
+				this._unit(runner);
 				
 				if (this._context_keys) {
 					for (i = 0, len = this._context_keys.length; i < len; ++i) {
 						key = this._context_keys[i];
-						this._test.context[key] = this[key];
-						delete this[key];
+						if (typeof(this[key]) == 'undefined') {
+							delete this._test.context[key];
+						} else {
+							this._test.context[key] = this[key];
+							delete this[key];	
+						}
 					}
 				}
 			} catch (e) {
@@ -150,12 +154,12 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 					} else if (this._expected == e.name) {
 						pass();
 					} else {
-						fail('Expected a "' + this._expected + '" exception, ' +
-							'but the test threw ' + e.toString() + ' instead.');
+						unexpected_error(e);
 					}
 					return;
 				} else {
 					unexpected_error(e);
+					return;
 				}
 			}
 	
@@ -176,6 +180,13 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 	
 	assertEqual: function assert_equal(expected, actual, message) {
 		if (!Crucible.equal(expected, actual)) {
+			throw new Crucible.Failure(this._test, message ||
+				'Expected ' + expected + ' but got ' + actual + '.');
+		}
+	},
+	
+	assertSame: function assert_same(expected, actual, message) {
+		if (expected !== actual) {
 			throw new Crucible.Failure(this._test, message ||
 				'Expected ' + expected + ' but got ' + actual + '.');
 		}
