@@ -54,14 +54,12 @@ div#pretty_runner {
 	border-spacing: 0;
 }
 
-table#pretty_runner_results tr {
-	border-bottom: 1px solid #444;
-}
-
 table#pretty_runner_results td {
 	height: 16px;
-	border-top: 1px solid #333;
+	border: none;
+	border-bottom: 1px solid #333;
 	padding: 4px;
+	margin: 0;
 }
 
 table#pretty_runner_results td.pr_result_icon {
