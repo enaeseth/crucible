@@ -228,6 +228,7 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 	
 	addMessage: function add_message_to_table(type, message, buttons) {
 		var doc, row, icon_cell, icon, message_cell, button_cell;
+		var ie6 = /MSIE 6/.test(navigator.userAgent);
 		var mo;
 		var runner = this;
 		if (!this.results)
@@ -238,26 +239,32 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		
 		icon_cell = row.insertCell(-1);
 		icon_cell.className = 'pr_result_icon';
-		icon = document.createElement('IMG');
-		icon_cell.appendChild(icon);
+		
+		function set_icon(path) {
+			if (!icon) {
+				icon = doc.createElement((ie6) ? 'SPAN' : 'IMG');
+				icon_cell.appendChild(icon);
+			}
+			
+			if (ie6) {
+				icon.style.filter = "progid:" +
+					"DXImageTransform.Microsoft.AlphaImageLoader(src='" +
+				    path + "', sizingMethod='image')";
+			} else {
+				icon.src = path;
+			}
+		}
 		
 		message_cell = row.insertCell(-1);
 		message_cell.className = 'pr_result_body';
 		
 		mo = {
 			setType: function set_pr_message_type(type) {
-				var params, path;
+				var params;
 				if (!(params = Crucible.PrettyRunner._type_params[type]))
 					throw new Error('Unknown message type "' + type + '".');
-				path = runner.base + 'assets/icons/' + params.icon;
 				row.className = params.row_class;
-				icon.src = path;
-				if (/MSIE 6/.test(navigator.userAgent)) {
-					icon.style.display = 'inline-block';
-					icon.style.filter = "progid:" +
-						"DXImageTransform.Microsoft.AlphaImageLoader(src='" +
-					    path + "', sizingMethod='image')";
-				}
+				set_icon(runner.base + 'assets/icons/' + params.icon);
 			},
 			
 			setMessage: function set_pr_message_text(message) {

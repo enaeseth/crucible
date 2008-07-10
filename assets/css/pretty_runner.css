@@ -67,6 +67,13 @@ table#pretty_runner_results td.pr_result_icon {
 	vertical-align: top;
 }
 
+/* IE6 alpha channel fix */
+table#pretty_runner_results td.pr_result_icon span {
+	width: 16px;
+	height: 16px;
+	display: inline-block;
+}
+
 table#pretty_runner_results td.pr_result_buttons {
 	text-align: right;
 }
