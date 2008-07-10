@@ -4,6 +4,7 @@
  */
 Crucible.Runner = function Runner() {
 	var i, length, ev;
+	this.sources = [];
 	for (i = 0, length = Crucible.Runner.events.length; i < length; i++) {
 		ev = Crucible.Runner.events[i];
 		this[ev] = new Crucible.Delegator(ev);
@@ -13,7 +14,7 @@ Crucible.Runner = function Runner() {
 Crucible.augment(Crucible.Runner.prototype,
 	/** @lends Crucible.Runner.prototype */
 {
-	sources: [],
+	sources: null,
 	source_index: null,
 	current_test: null,
 	
@@ -32,7 +33,7 @@ Crucible.augment(Crucible.Runner.prototype,
 		this.runSource(0);
 	},
 	
-	_sourceClosed: function _runner_source_closed(source) {
+	_sourceClosed: function _runner_source_closed(parent, source) {
 		if (source == this.sources[this.source_index]) {
 			this.runSource(this.source_index + 1);
 		}
@@ -58,7 +59,7 @@ Crucible.augment(Crucible.Runner.prototype,
 	report: function report_result_to_runner(test, result) {
 		this.testFinished.call(test, result);
 		if (result === true) {
-			this.testSucceeded.call(test);
+			this.testPassed.call(test);
 		} else if (result.name == 'Crucible.Failure') {
 			this.testFailed.call(test, result);
 		} else if (result.name == 'Crucible.UnexpectedError') {
@@ -75,5 +76,5 @@ Crucible.augment(Crucible.Runner.prototype,
 
 /** @ignore */
 Crucible.Runner.events = ['started', 'sourceOpened', 'testStarted',
-	'testFinished', 'testSucceeded', 'testFailed', 'testError',
+	'testFinished', 'testPassed', 'testFailed', 'testError',
 	'sourceClosed', 'completed'];

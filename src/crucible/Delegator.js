@@ -5,6 +5,7 @@
 Crucible.Delegator = function Delegator(name) {
 	if (name)
 		this.name = name;
+	this.listeners = [];
 };
 
 Crucible.augment(Crucible.Delegator.prototype,
@@ -21,7 +22,7 @@ Crucible.augment(Crucible.Delegator.prototype,
 	 * @type Object[]
 	 * @private
 	 */
-	listeners: [],
+	listeners: null,
 	
 	/**
 	 * Calls all listeners.

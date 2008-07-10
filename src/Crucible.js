@@ -37,9 +37,9 @@ var Crucible = {
 	 */
 	getHandler: function get_source_handler(source) {
 		var i, len;
-		for (i = 0, len = handlers.length; i < len; ++i) {
-			if (handlers[i].handles(source))
-				return handlers[i];
+		for (i = 0, len = Crucible.handlers.length; i < len; ++i) {
+			if (Crucible.handlers[i].handles(source))
+				return Crucible.handlers[i];
 		}
 		
 		throw new Error('No source handler accepted the given source.');

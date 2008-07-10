@@ -122,7 +122,8 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 				this.unit();
 			} catch (e) {
 				if (e.name == 'Crucible.Failure') {
-					return this.runner.report(this.test, e);
+					this.runner.report(this.test, e);
+					return;
 				} else if (e.name == 'Crucible.AsyncCompletion') {
 					return;
 				} else if (this.expected) {
@@ -144,8 +145,9 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 				ex_desc = (this.expected === true)
 					? "an exception"
 					: 'a "' + this.expected + '" exception';
-				return fail("Expected " + ex_desc + ' to be thrown, but none ' +
+				fail("Expected " + ex_desc + ' to be thrown, but none ' +
 					'was.');
+				return;
 			}
 			
 			this.runner.report(this.test, true);
@@ -264,7 +266,9 @@ Crucible.augment(Crucible.Test.Handler.prototype,
 		}
 		
 		runner.testFinished.add(test_finished, test);
-		
+		runner.testStarted.call(test);
 		test.run(runner, (parent && parent.testContext) || null);
 	}
 });
+
+Crucible.addSourceHandler(new Crucible.Test.Handler());

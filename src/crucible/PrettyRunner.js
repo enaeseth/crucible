@@ -9,7 +9,13 @@ Crucible.PrettyRunner = function PrettyRunner(product) {
 	Crucible.Runner.call(this);
 	if (product)
 		this.product = product;
+		
+	for (var name in this._eventListeners) {
+		this[name].add(this._eventListeners[name], this);
+	}
 	
+	this._test_messages = [];
+		
 	this.draw();
 };
 
@@ -51,39 +57,68 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		this.addMessage('prompt', message, buttons);
 	},
 	
-	testStarted: function pr_test_started(test) {
-		this._test_msg = this.addMessage('running', 'Testing &ldquo;' +
-			test.name + '&rdquo;&hellip;');
+	_getMessage: function _get_message_for_test(test, remove) {
+		var i, len, entry, message;
+		for (i = 0, len = this._test_messages.length; i < len; ++i) {
+			entry = this._test_messages[i];
+			if (entry && entry.test == test) {
+				message = entry.message;
+				if (remove)
+					this._test_messages.splice(i, 1);
+				return message;
+			}
+		}
+		
+		return null;
 	},
 	
-	testSucceeded: function pr_test_succeeded(test) {
-		this._test_msg.setType('pass');
-		this._test_msg.setMessage(test.name);
-		this.tallies.pass++;
-		this._test_msg = null;
+	_setMessage: function _set_message_for_test(test, message) {
+		var old = this._getMessage(test, true);
+		if (old && old.remove)
+			old.remove();
+		this._test_messages.push({test: test, message: message});
+		return message;
 	},
 	
-	testFailed: function pr_test_failed(test, failure) {
-		this._test_msg.setType('fail');
-		this._test_msg.setMessage(test.name + ': ' + failure.description);
-		if (this.status == 'ok')
-			this.setStatus('failure');
-		this.tallies.fail++;
-		this._test_msg = null;
-	},
+	_eventListeners: {
+		testStarted: function pr_test_started(test) {
+			var msg = this.addMessage('running', 'Testing &ldquo;' + test.name +
+				'&rdquo;&hellip;');
+			this._setMessage(test, msg);
+		},
 	
-	testError: function pr_test_error(test, error) {
-		this._test_msg.setType('error');
-		this._test_msg.setMessage('Test &ldquo;' + test.name + '&rdquo; had ' +
-			'an <b>error</b>: ' + error.error.toString());
-		this.setStatus('error');
-		this.tallies.error++;
-		this._test_msg = null;
-	},
+		testPassed: function pr_test_succeeded(test) {
+			var message = this._getMessage(test);
+			message.setType('pass');
+			message.setMessage(test.name);
+			this.tallies.pass++;
+			console.debug('Test passed: ' + test.name);
+		},
 	
-	completed: function pr_run_completed() {
-		this.addMessage('done', "Crucible finished testing "
-			+ this.product + ".");
+		testFailed: function pr_test_failed(test, failure) {
+			var message = this._getMessage(test);
+			message.setType('fail');
+			message.setMessage(test.name + ': ' + failure.description);
+			if (this.status == 'ok')
+				this.setStatus('failure');
+			this.tallies.fail++;
+			console.debug('Test failed: ' + test.name);
+		},
+	
+		testError: function pr_test_error(test, error) {
+			var message = this._getMessage(test);
+			message.setType('error');
+			message.setMessage('Test &ldquo;' + test.name + '&rdquo; ' +
+				'had an <b>error</b>: ' + error.error.toString());
+			this.setStatus('error');
+			this.tallies.error++;
+			console.debug('Test had an error: ' + test.name);
+		},
+	
+		completed: function pr_run_completed() {
+			this.addMessage('done', "Crucible has finished testing "
+				+ this.product + ".");
+		}
 	},
 	
 	/**
@@ -99,10 +134,10 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 	_done_adding: false,
 	
 	/**
-	 * @type Object
+	 * @type Object[]
 	 * @private
 	 */
-	_test_msg: null,
+	_test_messages: null,
 	
 	/**
 	 * @type Object
@@ -183,6 +218,7 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 			},
 			
 			setButtons: function set_pr_message_buttons(buttons) {
+				var button;
 				function click_listener(button) {
 					return function (ev) {
 						if (typeof(button.pr_action) == 'function')

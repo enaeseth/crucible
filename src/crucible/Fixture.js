@@ -4,6 +4,7 @@
  */
 Crucible.Fixture = function Fixture(name) {
 	this.name = name || null;
+	this.tests = [];
 };
 
 Crucible.augment(Crucible.Fixture.prototype,
@@ -19,7 +20,7 @@ Crucible.augment(Crucible.Fixture.prototype,
 	 * All the tests that have been added to the fixture.
 	 * @type Array
 	 */
-	tests: [],
+	tests: null,
 	
 	/**
 	 * This function will be called when the fixture is added to a runner, and
@@ -116,3 +117,5 @@ Crucible.augment(Crucible.Fixture.Handler.prototype,
 		next_test();
 	}
 });
+
+Crucible.addSourceHandler(new Crucible.Fixture.Handler());
