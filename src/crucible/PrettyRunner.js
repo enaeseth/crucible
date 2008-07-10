@@ -122,7 +122,11 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 			tally_table.id = "pr_tally";
 			
 			function round(number) {
-				return String(number).match(/\d+(\.\d)?/)[0];
+				try {
+					return String(number).match(/\d+(\.\d)?/)[0];
+				} catch (e) {
+					return '0';
+				}
 			}
 			
 			function make_row(title, count) {
