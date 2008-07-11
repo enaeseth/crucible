@@ -270,7 +270,7 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 			labels = ['Yes', 'No'];
 			
 		function fail() {
-			this._fail(description || 'Verification failed.');
+			this.fail(description || 'Verification failed.');
 		}
 		
 		buttons[labels[0]] = new Crucible.Test.Unit(this._test, on_ok,
