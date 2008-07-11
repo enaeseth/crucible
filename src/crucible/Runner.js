@@ -57,7 +57,6 @@ Crucible.augment(Crucible.Runner.prototype,
 	},
 	
 	report: function report_result_to_runner(test, result) {
-		this.testFinished.call(test, result);
 		if (result === true) {
 			this.testPassed.call(test);
 		} else if (result.name == 'Crucible.Failure') {
@@ -67,6 +66,7 @@ Crucible.augment(Crucible.Runner.prototype,
 		} else {
 			throw new Error('Unable to understand test result: ' + result);
 		}
+		this.testFinished.call(test, result);
 	},
 	
 	displayMessage: function runner_display_message(message, buttons) {
