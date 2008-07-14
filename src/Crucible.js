@@ -225,6 +225,7 @@ var Crucible = {
 #include "crucible/Failure.js"
 #include "crucible/AsyncCompletion.js"
 #include "crucible/UnexpectedError.js"
+#include "crucible/Tools.js"
 #include "crucible/Delegator.js"
 #include "crucible/SourceHandler.js"
 #include "crucible/Test.js"

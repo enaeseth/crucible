@@ -279,6 +279,12 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 		
 		this._runner.displayMessage(question, buttons);
 		throw new Crucible.AsyncCompletion();
+	},
+	
+	log: function log_information() {
+		if (this._runner.log) {
+			this._runner.log.apply(this._runner, arguments);
+		}
 	}
 });
 

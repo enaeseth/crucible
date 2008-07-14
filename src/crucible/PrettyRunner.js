@@ -57,6 +57,26 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		this.addMessage('prompt', message, buttons);
 	},
 	
+	log: function pr_log_message() {
+		var message = [], i, length, arg, part;
+		
+		for (i = 0, length = arguments.length; i < length; ++i) {
+			arg = arguments[i];
+			part = (typeof(arg) == 'string')
+				? arg
+				: Crucible.Tools.inspect(arg);
+				
+			part = Crucible.Tools.gsub(part, '<', '&lt;');
+			part = Crucible.Tools.gsub(part, '>', '&gt;');
+				
+			if (typeof(arg) != 'string')
+				part = '<code>' + part + '</code>';
+			message.push(part);
+		}
+		
+		this.addMessage('log', message.join(' '));
+	},
+	
 	_getMessage: function _get_message_for_test(test, remove) {
 		var i, len, entry, message;
 		for (i = 0, len = this._test_messages.length; i < len; ++i) {
@@ -482,6 +502,10 @@ Crucible.augment(Crucible.PrettyRunner, {
 		'done': {
 			row_class: 'pr_done',
 			icon: 'flag_blue.png'
+		},
+		'log': {
+			row_class: 'pr_log_message',
+			icon: 'information.png'
 		}
 	}
 });
