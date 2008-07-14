@@ -42,6 +42,47 @@ Crucible.Tools = {
 		}
 		
 		return result;
+	},
+	
+	/**
+	 * Returns the attributes of an element.
+	 * @param {Element}	elem
+	 * @return {Object}	an object whose keys are attribute names and whose
+	 *					values are the corresponding values
+	 */
+	get_attributes: function get_element_attributes(elem)
+	{
+		var attrs = {};
+		
+		if (typeof(elem) != 'object' || !elem) {
+			throw new TypeError('Cannot get the attributes of a non-object.');
+		}
+		
+		if (elem.nodeType != 1 || !elem.hasAttributes())
+			return attrs;
+		
+		for (var i = 0; i < elem.attributes.length; i++) {
+			var a = elem.attributes[i];
+			if (!a.specified || a.nodeName in attrs)
+				continue;
+				
+			var v = (a.nodeValue.toString)
+				? a.nodeValue.toString()
+				: a.nodeValue;
+			
+			switch (a.nodeName) {
+				case 'class':
+					attrs.className = v;
+					break;
+				case 'for':
+					attrs.htmlFor = v;
+					break;
+				default:
+					attrs[a.nodeName] = v;
+			}
+		}
+		
+		return attrs;
 	}
 };
 
@@ -68,6 +109,15 @@ Crucible.Tools.inspect.handlers = {
 	'object': function(o) {
 		var reprs = [];
 		
+		if (o.nodeType) {
+			if (o.nodeType == 3)
+				return this.string(o.nodeValue);
+			else if (o.nodeType == 1)
+				return this.element(o);
+			else
+				return '[Node]';
+		}
+		
 		if (o === null)
 			return 'null';
 		
@@ -76,6 +126,19 @@ Crucible.Tools.inspect.handlers = {
 		}
 		
 		return '{' + reprs.join(', ') + '}';
+	},
+	
+	element: function(el) {
+		var attrs, name, tag;
+		
+		tag = '<' + el.tagName.toLowerCase();
+		
+		attrs = Crucible.Tools.get_attributes(el);
+		for (var name in attrs) {
+			tag += ' ' + name + '="' + attrs[name] + '"';
+		}
+		
+		return tag + '>';
 	}
 };
 
