@@ -6,7 +6,7 @@ var Crucible = {
 	 * The version of Crucible in use.
 	 * @type String
 	 */
-	version: '0.1.0',
+	version: '0.1.1',
 	
 	/**
 	 * The Crucible base URI. Normally autodetected.
