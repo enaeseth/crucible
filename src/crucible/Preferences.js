@@ -19,7 +19,7 @@ Crucible.Preferences = {
 	
 	set: function set_preference(name, value) {
 		var self = Crucible.Preferences;
-		var process, value;
+		var process;
 		
 		process = self._get_processor(name, 'set');
 		
