@@ -229,5 +229,6 @@ var Crucible = {
 #include "crucible/SourceHandler.js"
 #include "crucible/Test.js"
 #include "crucible/Fixture.js"
+#include "crucible/Preferences.js"
 #include "crucible/Runner.js"
 #include "crucible/PrettyRunner.js"
