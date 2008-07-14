@@ -124,10 +124,10 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		},
 	
 		testError: function pr_test_error(test, error) {
-			var message = this._getMessage(test);
+			var message = this._getMessage(test), ex = error.error;
 			message.setType('error');
-			message.setMessage('Test &ldquo;' + test.name + '&rdquo; ' +
-				'had an <b>error</b>: ' + error.error.toString());
+			message.setMessage(ex.name + ' in test &ldquo;' + test.name +
+				'&rdquo;: <br /><code>' + ex.message + '</code>');
 			this.setStatus('error');
 			this.tallies.error++;
 		},
