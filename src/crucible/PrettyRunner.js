@@ -348,6 +348,26 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		this.status = status;
 	},
 	
+	toggleOpen: function toggle_pretty_runner_open() {
+		var row;
+		var new_state = !(this.body.className == 'pr_active');
+		
+		this.body.className = (new_state)
+			? 'pr_active'
+			: '';
+		this.titlebar.title = (new_state)
+			? 'Click to close.'
+			: 'Click to open.';
+		if (new_state == 'pr_active' && this.results) {
+			row = this.results.rows[this.results.rows.length-1];
+			Crucible.defer(function() {
+				row.scrollIntoView();
+			});
+		}
+		
+		Crucible.Preferences.set('pr_status', (new_state ? 'open' : 'closed'));
+	},
+	
 	/**
 	 * Creates the runner interface.
 	 * @private
@@ -396,28 +416,17 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		this.titlebar.appendChild(document.createTextNode("\nCrucible"));
 		this.root.appendChild(this.titlebar);
 		
-		Crucible.observeEvent(this.titlebar, 'click', Crucible.bind(function() {
-			var row;
-			
-			this.body.className = (!this.body.className)
-				? 'pr_active'
-				: '';
-			this.titlebar.title = (this.body.className == 'pr_active')
-				? 'Click to close.'
-				: 'Click to open.';
-			if (this.body.className == 'pr_active' && this.results) {
-				row = this.results.rows[this.results.rows.length-1];
-				Crucible.defer(function() {
-					row.scrollIntoView();
-				});
-			}
-		}, this));
+		Crucible.observeEvent(this.titlebar, 'click',
+			Crucible.bind(this.toggleOpen, this));
 		
 		this.body = document.createElement('DIV');
 		this.body.id = 'pretty_runner_body';
 		this.root.appendChild(this.body);
 		
 		document.body.appendChild(this.root);
+		
+		if (Crucible.Preferences.get('pr_status') == 'open')
+			this.toggleOpen();
 	},
 	
 	/**

@@ -87,6 +87,9 @@ Crucible.Preferences = {
 	},
 	
 	_prefs: {
+		pr_status: {
+			value: 'closed'
+		}
 	},
 	
 	_default_processors: {
