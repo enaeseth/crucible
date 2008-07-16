@@ -143,7 +143,7 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 					}
 				}
 			} catch (e) {
-				if (e.name == 'Crucible.Failure') {
+				if (e._crucible_failure) {
 					this._runner.report(this._test, e);
 					return;
 				} else if (e.name == 'Crucible.AsyncCompletion') {
@@ -180,15 +180,13 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 	
 	assertEqual: function assert_equal(expected, actual, message) {
 		if (!Crucible.equal(expected, actual)) {
-			throw new Crucible.Failure(this._test, message ||
-				'Expected ' + expected + ' but got ' + actual + '.');
+			throw new Crucible.ExpectationFailure(this._test, expected, actual);
 		}
 	},
 	
 	assertSame: function assert_same(expected, actual, message) {
 		if (expected !== actual) {
-			throw new Crucible.Failure(this._test, message ||
-				'Expected ' + expected + ' but got ' + actual + '.');
+			throw new Crucible.ExpectationFailure(this._test, expected, actual);
 		}
 	},
 	

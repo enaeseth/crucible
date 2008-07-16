@@ -59,7 +59,7 @@ Crucible.augment(Crucible.Runner.prototype,
 	report: function report_result_to_runner(test, result) {
 		if (result === true) {
 			this.testPassed.call(test);
-		} else if (result.name == 'Crucible.Failure') {
+		} else if (result._crucible_failure) {
 			this.testFailed.call(test, result);
 		} else if (result.name == 'Crucible.UnexpectedError') {
 			this.testError.call(test, result);

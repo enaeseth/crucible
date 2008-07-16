@@ -6,10 +6,13 @@
  * @augments Error
  */
 Crucible.Failure = function Failure(test, message) {
-	Error.call(this, 'Failure in test "' + test.name + '": ' + message);
-	this.name = "Crucible.Failure";
-	this.description = message;
-	this.test = test;
+	var err = new Error('Failure in test "' + test.name + '": ' + message)
+	
+	err.name = "Crucible.Failure";
+	err.description = message || null;
+	err.test = test || null;
+	
+	err._crucible_failure = true;
+	
+	return err;
 };
-
-Crucible.Failure.prototype = new Error(null);

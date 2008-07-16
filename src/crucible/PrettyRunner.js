@@ -117,7 +117,8 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		testFailed: function pr_test_failed(test, failure) {
 			var message = this._getMessage(test);
 			message.setType('fail');
-			message.setMessage(test.name + ': ' + failure.description);
+			message.setMessage(test.name + ': ' +
+				(failure.htmlDescription || failure.description));
 			if (this.status == 'ok')
 				this.setStatus('failure');
 			this.tallies.fail++;

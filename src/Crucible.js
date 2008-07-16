@@ -223,6 +223,7 @@ var Crucible = {
 };
 
 #include "crucible/Failure.js"
+#include "crucible/ExpectationFailure.js"
 #include "crucible/AsyncCompletion.js"
 #include "crucible/UnexpectedError.js"
 #include "crucible/Tools.js"
