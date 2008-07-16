@@ -109,6 +109,9 @@ Crucible.Tools.inspect.handlers = {
 	'object': function(o) {
 		var reprs = [];
 		
+		if (o === null)
+			return 'null';
+		
 		if (o.nodeType) {
 			if (o.nodeType == 3)
 				return this.string(o.nodeValue);
@@ -118,14 +121,15 @@ Crucible.Tools.inspect.handlers = {
 				return '[Node]';
 		}
 		
-		if (o === null)
-			return 'null';
-		
 		for (var name in o) {
 			reprs.push(name + ': ' + Crucible.Tools.inspect(o[name]));
 		}
 		
 		return '{' + reprs.join(', ') + '}';
+	},
+	
+	'undefined': function() {
+		return 'undefined';
 	},
 	
 	element: function(el) {
