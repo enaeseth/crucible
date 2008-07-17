@@ -21,10 +21,16 @@ def main():
 		help='version identifier string used in building the package',
 		metavar='VERSION')
 	parser.add_option('-p', '--path', dest='path', metavar='PATH',
-		help='path to the Crucible folder', default=None)
-	parser.add_option('--archive-format', dest='archive_format',
-		help='archive format (zip, tar.gz, or tar.bz2)', metavar='FORMAT',
-		default='tar.bz2')
+		help='path to the Crucible folder')
+	parser.add_option('--archive-formats', dest='archive_format',
+		help='archive formats (zip, tar.gz, and/or tar.bz2)', metavar='FORMAT')
+	
+	parser.set_defaults(path=None, archive_format='tar.bz2')
+	
+	options, args = parser.parse_args()
+	
+	if not options.version:
+		parser.error('please specify the Crucible version being built')
 	
 	
 	
