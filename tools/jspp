@@ -13,12 +13,23 @@ import re
 
 class Preprocessor(object):
 	"""The JavaScript preprocessor."""
-	def __init__(self, include_path):
+	def __init__(self, include_path, definitions=None):
 		super(Preprocessor, self).__init__()
 		self.include_path = include_path.split(os.pathsep)
+		self.definitions = {}
 		self.done = {}
 		
-	incl_pattern = re.compile('^\s*#include\s*("([^"]+)"|<([^>]+)>).*$')
+		for name, value in definitions:
+			self._add_definition(name, value)
+		
+	incl_pattern = re.compile(r'^\s*#include\s*("([^"]+)"|<([^>]+)>).*$')
+	def_pattern = re.compile(r'^\s*#define\s+(\w+)(?:\s+(.+))?$')
+	
+	def _add_definition(self, name, value):
+		self.definitions[name] = {
+			'pattern': re.compile(r'\b%s\b' % name),
+			'value': value
+		}
 	
 	def process(self, path, filename):
 		real_path = os.path.normpath(os.path.join(path, filename))
@@ -44,16 +55,25 @@ class Preprocessor(object):
 		output = []
 		for num, line in enumerate(file(os.path.join(path, filename))):
 			match = self.incl_pattern.search(line)
-			if not match:
-				output.append(line)
-			else:
+			if match:
 				try:
 					output.append(self.process(*get_path(match)))
 				except IOError, e:
 					print >>sys.stderr, ("error at %s:%d: %s" %
 						(os.path.join(path, filename), num + 1, e))
 					sys.exit(-1)
+				continue
+			
+			match = self.def_pattern.search(line)
+			if match:
+				self._add_definition(match.group(1), match.group(2))
+				continue
+				
+			for d in self.definitions.itervalues():
+				print d['pattern'].pattern, d['value']
+				d['pattern'].sub(d['value'], line)
 		
+			output.append(line)
 		return ''.join(output)
 	
 def main():
@@ -61,10 +81,16 @@ def main():
 	parser.add_option('-I', dest='include_path',
 		help='a %s-separated list of folders to scan for files' % os.pathsep,
 		default='')
+	parser.add_option('-D', dest='definitions',
+		help='preprocessor definitions', action='append')
 	
 	options, args = parser.parse_args()
 	
-	pp = Preprocessor(options.include_path)
+	if not args:
+		parser.error('must provide a file to preprocess')
+	
+	pp = Preprocessor(options.include_path,
+		(d.split('=') for d in options.definitions or ()))
 	path, filename = os.path.split(args[0])
 	print pp.process(path, filename)
 
