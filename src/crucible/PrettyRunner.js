@@ -456,7 +456,9 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 	/** @private */
 	_onScroll: function _pr_on_scroll() {
 		var scrolled = window.pageYOffset || window.scrollTop || 0;
-		var new_pos = scrolled + window.innerHeight - this.root.clientHeight;
+		var window_height = (window.innerHeight
+			|| window.documentElement.clientHeight || window.body.clientHeight);
+		var new_pos = scrolled + window_height - this.root.clientHeight;
 		
 		this.root.style.bottom = 'auto';
 		this.root.style.top = new_pos + 'px';
