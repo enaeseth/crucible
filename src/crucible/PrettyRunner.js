@@ -385,7 +385,7 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 				row.scrollIntoView();
 			});
 		}
-		
+		this._onScroll();
 		Crucible.Preferences.set('pr_status', (new_state ? 'open' : 'closed'));
 	},
 	
@@ -446,8 +446,21 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		
 		document.body.appendChild(this.root);
 		
+		Crucible.observeEvent(window, 'scroll',
+			Crucible.bind(this._onScroll, this));
+		
 		if (Crucible.Preferences.get('pr_status') == 'open')
 			this.toggleOpen();
+	},
+	
+	/** @private */
+	_onScroll: function _pr_on_scroll() {
+		var scrolled = window.pageYOffset || window.scrollTop || 0;
+		var new_pos = scrolled + window.innerHeight - this.root.clientHeight;
+		
+		console.debug(new_pos);
+		this.root.style.bottom = 'auto';
+		this.root.style.top = new_pos + 'px';
 	},
 	
 	/**
