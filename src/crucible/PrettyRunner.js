@@ -458,7 +458,6 @@ Crucible.augment(Crucible.PrettyRunner.prototype,
 		var scrolled = window.pageYOffset || window.scrollTop || 0;
 		var new_pos = scrolled + window.innerHeight - this.root.clientHeight;
 		
-		console.debug(new_pos);
 		this.root.style.bottom = 'auto';
 		this.root.style.top = new_pos + 'px';
 	},
