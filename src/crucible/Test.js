@@ -180,13 +180,17 @@ Crucible.augment(Crucible.Test.Unit.prototype,
 	
 	assertEqual: function assert_equal(expected, actual, message) {
 		if (!Crucible.equal(expected, actual)) {
-			throw new Crucible.ExpectationFailure(this._test, expected, actual);
+			throw (message)
+				? new Crucible.ExpectationFailure(this._test, expected, actual)
+				: new Crucible.Failure(this._test, message);
 		}
 	},
 	
 	assertSame: function assert_same(expected, actual, message) {
 		if (expected !== actual) {
-			throw new Crucible.ExpectationFailure(this._test, expected, actual);
+			throw (message)
+				? new Crucible.ExpectationFailure(this._test, expected, actual)
+				: new Crucible.Failure(this._test, message);
 		}
 	},
 	
