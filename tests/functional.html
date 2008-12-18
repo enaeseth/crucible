@@ -35,7 +35,7 @@
 								return;
 							}
 						case 'fail':
-							if (result.name == 'Crucible.Failure') {
+							if (/^Crucible\.\w*Failure$/.test(result.name)) {
 								pr.report(test, true);
 								return;
 							}
@@ -48,7 +48,7 @@
 
 					if (result === true)
 						desc = 'pass';
-					else if (result.name == 'Crucible.Failure')
+					else if (/^Crucible\.\w*Failure$/.test(result.name))
 						desc = 'fail';
 					else if (result.name == 'Crucible.UnexpectedError')
 						desc = 'error';
