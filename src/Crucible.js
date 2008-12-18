@@ -233,6 +233,7 @@ var Crucible = {
 #include "crucible/Tools.js"
 #include "crucible/Delegator.js"
 #include "crucible/SourceHandler.js"
+#include "crucible/Assertions.js"
 #include "crucible/Test.js"
 #include "crucible/Fixture.js"
 #include "crucible/Preferences.js"
