@@ -6,7 +6,7 @@ Crucible is a unit testing system for JavaScript applications.
 License
 -------
 
-Smooth is made available under the terms of the MIT License.
+Crucible is made available under the terms of the MIT License.
 
 Copyright © 2008 [Carleton College][carleton]
 
