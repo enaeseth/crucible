@@ -80,12 +80,16 @@ var Crucible = {
 		seen = {};
 
 		for (var name in a) {
+			if (name in Object.prototype)
+				continue;
 			if (!(name in b && Crucible.equal(a[name], b[name])))
 				return false;
 			seen[name] = true;
 		}
 
 		for (var name in b) {
+			if (name in Object.prototype)
+				continue;
 			if (!(name in seen))
 				return false;
 		}
