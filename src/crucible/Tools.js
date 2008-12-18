@@ -121,11 +121,26 @@ Crucible.Tools.inspect.handlers = {
 				return '[Node]';
 		}
 		
+		if (typeof(o.length) == 'number' && o.length >= 0)
+			return this.array(o);
+		
 		for (var name in o) {
+			if (name in Object.prototype)
+				continue;
 			reprs.push(name + ': ' + Crucible.Tools.inspect(o[name]));
 		}
 		
 		return '{' + reprs.join(', ') + '}';
+	},
+	
+	'array': function(a) {
+		var reprs = [];
+		
+		for (var i = 0; i < a.length; i++) {
+			reprs.push(Crucible.Tools.inspect(a[i]));
+		}
+		
+		return '[' + reprs.join(', ') + ']';
 	},
 	
 	'undefined': function() {
