@@ -6,7 +6,7 @@ CRUCIBLE_PATH = File.expand_path(File.dirname(__FILE__))
 CRUCIBLE_SRC = File.join(CRUCIBLE_PATH, 'src')
 CRUCIBLE_BUILD = File.join(CRUCIBLE_PATH, 'build')
 CRUCIBLE_PKG = File.join(CRUCIBLE_PATH, 'pkg')
-CRUCIBLE_VER = '0.1.1'
+CRUCIBLE_VER = '0.2a1'
 
 task :default => [:script]
 
@@ -43,7 +43,6 @@ Rake::PackageTask.new('crucible-src', (ENV['version'] or CRUCIBLE_VER)) do |pack
     'Rakefile',
     'src',
     'tests/**'
-    #'tools/**'
   )
 end
 
