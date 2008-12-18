@@ -18,8 +18,10 @@ Crucible.augment(Crucible.Runner.prototype,
 	source_index: null,
 	current_test: null,
 	
-	add: function add_test_source_to_runner(source) {
-		this.sources.push(source);
+	add: function add_test_source_to_runner(name, test, expected) {
+		this.sources.push((typeof(name) == 'object')
+			? name
+			: new Crucible.Test(name, test, expected));
 	},
 	
 	doneAdding: function done_adding_sources_to_runner() {
