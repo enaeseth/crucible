@@ -117,6 +117,10 @@ Crucible.Tools.inspect.handlers = {
 				return this.string(o.nodeValue);
 			else if (o.nodeType == 1)
 				return this.element(o);
+			else if (o.nodeType == 8)
+				return this.comment(o);
+			else if (o.nodeType == 9)
+				return this.document(o);
 			else
 				return '[Node]';
 		}
@@ -158,6 +162,14 @@ Crucible.Tools.inspect.handlers = {
 		}
 		
 		return tag + '>';
+	},
+	
+	comment: function(node) {
+		return '<!-- ' + node.nodeValue + ' -->';
+	},
+	
+	document: function(document) {
+		return '[Document]';
 	}
 };
 
