@@ -30,7 +30,7 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 		TableRunner.superclass.initialize.call(this, product, tests);
 		
 		Crucible.Tools.addStyleSheet(Crucible.base +
-			'/assets/table_runner.css');
+			'/assets/css/table_runner.css');
 		
 		this.root = build('div', {id: 'crucible_results'});
 		this.root.appendChild('h1', {}, this.product);
