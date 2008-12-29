@@ -44,12 +44,7 @@ Crucible.Tools = {
 		return result;
 	},
 	
-<<<<<<< Updated upstream:src/crucible/Tools.js
 	trim: function trim_string(str) {
-=======
-	trim: function trim_string(str)
-	{
->>>>>>> Stashed changes:src/crucible/Tools.js
 		str = str.replace(/^\s+/, '');
 		for (var i = str.length - 1; i >= 0; i--) {
 			if (/\S/.test(str.charAt(i))) {
