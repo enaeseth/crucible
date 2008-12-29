@@ -132,21 +132,6 @@ var Crucible = {
 		return Crucible.delay.apply(Crucible, args);
 	},
 	
-	addStyleSheet: function add_style_sheet(path) {
-		var heads = document.getElementsByTagName('HEAD');
-		var head, link;
-		
-		if (!heads.length)
-			throw new Error('Document has no HEAD.');
-		head = heads[0];
-		
-		link = document.createElement('LINK');
-		link.rel = 'stylesheet';
-		link.type = 'text/css';
-		link.href = path;
-		return head.appendChild(link);
-	},
-	
 	determineBase: function determine_base_uri() {
 		if (Crucible.base)
 			return Crucible.base;

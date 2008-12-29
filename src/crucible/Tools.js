@@ -189,6 +189,18 @@ Crucible.Tools = {
 		});
 
 		return e;
+	},
+	
+	addStyleSheet: function add_style_sheet(path) {
+		var heads = document.getElementsByTagName('HEAD');
+		var head;
+		
+		if (!heads.length)
+			throw new Error('Document has no HEAD.');
+		head = heads[0];
+		
+		return head.appendChild(Crucible.Tools.element('link',
+			{rel: 'stylesheet', type: 'text/css', href: path}));
 	}
 };
 
