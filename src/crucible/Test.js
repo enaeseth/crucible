@@ -30,12 +30,10 @@ Crucible.Test = Crucible.Class.create({
 	// Parameters:
 	//     (String) id - the test's identifying string
 	//     (String) name - the test's human-readable name
-	//     (Crucible.Fixture) fixture - the test's fixture, or null if none
 	//     (Function) body - the test code
-	initialize: function Test(id, name, fixture, body) {
+	initialize: function Test(id, name, body) {
 		this.id = id;
 		this.name = name || id || null;
-		this.fixture = fixture || null;
 		this.context = new Crucible.Test.Context();
 		this.root = new Crucible.Test.Segment(this, body);
 		
