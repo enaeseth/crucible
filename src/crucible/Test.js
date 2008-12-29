@@ -61,6 +61,7 @@ Crucible.Test.parseID = function parse_test_id(id) {
 		throw new TypeError("Test ID must be a string.");
 	var pos = id.indexOf(':');
 	
+<<<<<<< Updated upstream:src/crucible/Test.js
 	var name;
 	if (pos > -1) {
 		name = Crucible.Tools.trim(id.substr(pos + 1));
@@ -68,6 +69,12 @@ Crucible.Test.parseID = function parse_test_id(id) {
 	} else {
 		name = null;
 	}
+=======
+	var name = (pos > -1) ?
+		Crucible.Tools.trim(id.substr(pos + 1)) :
+		null;
+	id = Crucible.Tools.trim(id.substr(pos));
+>>>>>>> Stashed changes:src/crucible/Test.js
 	
 	var ret = [id, name];
 	ret.id = id;
