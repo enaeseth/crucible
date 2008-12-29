@@ -36,12 +36,39 @@ Crucible.Fixture = Crucible.Class.create({
 				delete spec[name];
 			} else {
 				tid = Crucible.Test.parseID(name);
-				id = [this.id, tid.id].join('.');
-				test = Crucible.add(id, tid.name, spec[name]);
-				test.events.run.add(this, '_beforeTest');
-				test.events.result.add(this, '_afterTest');
+				this.add(tid.id, tid.name, spec[name]);
 			}
 		}
+	},
+	
+	add: function add_to_fixture(id, name, body) {
+		var key, tests, tid, test;
+		if (typeof(id) == 'object') {
+			tests = id;
+			for (key in tests) {
+				tid = Crucible.Test.parseID(key);
+				this.add(tid[0], tid[1], tests[key]);
+			}
+			return;
+		} else if (typeof(name) == 'object') {
+			tests = name;
+			for (key in tests) {
+				tid = Crucible.Test.parseID([id, key].join('.'));
+				this.add(tid[0], tid[1], tests[key]);
+			}
+			return;
+		} else if (typeof(name) == 'function') {
+			body = name;
+			name = null;
+		} else if (typeof(id) != 'string') {
+			throw new Error('Must identify the test being added.');
+		}
+		
+		tid = Crucible.Test.parseID(id);
+		test = Crucible.add([this.id, tid.id].join('.'), tid.name, spec[id]);
+		test.events.run.add(this, '_beforeTest');
+		test.events.result.add(this, '_afterTest');
+		return test;
 	},
 	
 	_beforeTest: function _fixture_do_set_up(test) {
