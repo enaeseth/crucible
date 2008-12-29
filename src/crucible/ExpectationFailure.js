@@ -12,16 +12,11 @@ Crucible.ExpectationFailure =
 	var err;
 	var expected_r = Crucible.Tools.inspect(expected);
 	var actual_r = Crucible.Tools.inspect(actual);
-	var message = 'Expected ' + expected_r + ' but actually got ' +
-		actual_r + '.';
-	var html_message = 'Expected <code>' + expected_r + '</code> but actually' +
+	var message = 'Expected <code>' + expected_r + '</code> but actually' +
 		' got <code>' + actual_r + '</code>.';
 	
 	err = new Crucible.Failure(test, message);
-	err.htmlDescription = html_message;
 	err.name = "Crucible.ExpectationFailure";
-	err.description = message;
-	err.test = test;
 	
 	return err;
 };
