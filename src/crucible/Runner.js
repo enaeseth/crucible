@@ -74,6 +74,6 @@ Crucible.Runner = Crucible.Class.create({
 		this.events.result.call(test, status, result || null);
 		Crucible.defer(function() {
 			this._runTest();
-		});
+		}, this);
 	}
 });
