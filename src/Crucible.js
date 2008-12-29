@@ -206,12 +206,12 @@ var Crucible = {
 	}
 };
 
-#include "crucible/Class.js"
-#include "crucible/Failure.js"
-#include "crucible/ExpectationFailure.js"
-#include "crucible/AsyncCompletion.js"
-#include "crucible/UnexpectedError.js"
-#include "crucible/Tools.js"
-#include "crucible/Delegator.js"
-#include "crucible/Assertions.js"
-#include "crucible/Preferences.js"
+#import "crucible/Class.js"
+#import "crucible/Failure.js"
+#import "crucible/ExpectationFailure.js"
+#import "crucible/AsyncCompletion.js"
+#import "crucible/UnexpectedError.js"
+#import "crucible/Tools.js"
+#import "crucible/Delegator.js"
+#import "crucible/Assertions.js"
+#import "crucible/Preferences.js"
