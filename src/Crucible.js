@@ -73,8 +73,22 @@ var Crucible = {
 	doneAdding: function crucible_done_adding() {
 		Crucible._doneAdding = true;
 		if (Crucible._windowReady) {
-			
+			Crucible._createRunner();
 		}
+	},
+	
+	_createRunner: function crucible_create_runner() {
+		var Runner = Crucible[Crucible.settings.runner_class];
+		Crucible.defaultRunner = new Runner(Crucible.product || null);
+		
+		if (Crucible.settings.autorun)
+			Crucible.run();
+		
+		return Crucible.defaultRunner;
+	},
+	
+	run: function crucible_run() {
+		Crucible.defaultRunner.run();
 	},
 	
 	/**
@@ -253,6 +267,13 @@ var Crucible = {
 		return value;
 	}
 };
+
+Crucible.observeEvent(window, 'load', function _crucible_window_loaded() {
+	Crucible._windowReady = true;
+	if (Crucible._doneAdding) {
+		Crucible._createRunner();
+	}
+});
 
 #import "crucible/Class.js"
 #import "crucible/Failure.js"
