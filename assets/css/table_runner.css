@@ -125,29 +125,29 @@ div#crucible_results .exception {
 }
 
 div#crucible_results table.tests tr.ready td {
-  background: url("icons/arrow.png") no-repeat scroll 5px center;
+  background: url("../icons/arrow.png") no-repeat scroll 5px center;
 }
 
 div#crucible_results table.tests tr.pass td {
-  background: url("icons/tick.png") no-repeat scroll 5px center;
+  background: url("../icons/tick.png") no-repeat scroll 5px center;
 }
 
 div#crucible_results table.tests tr.fail td {
-  background: url("icons/exclamation.png") no-repeat scroll 5px center;
+  background: url("../icons/exclamation.png") no-repeat scroll 5px center;
 }
 
 div#crucible_results table.tests tr.exception td {
-  background: url("icons/cross.png") no-repeat scroll 5px center;
+  background: url("../icons/cross.png") no-repeat scroll 5px center;
 }
 
 div#crucible_results table.tests tr.busy td {
-  background: #F2E7FA url("icons/gear.png") no-repeat scroll 5px center;
+  background: #F2E7FA url("../icons/gear.png") no-repeat scroll 5px center;
 }
 
 div#crucible_results table.tests tr.prompt td {
-  background: #E7F1FC url("icons/question.png") no-repeat scroll 5px center;
+  background: #E7F1FC url("../icons/question.png") no-repeat scroll 5px center;
 }
 
 div#crucible_results table.tests tr.log td {
-  background: #F9EFF9 url("icons/information.png") no-repeat scroll 5px center;
+  background: #F9EFF9 url("../icons/information.png") no-repeat scroll 5px center;
 }
