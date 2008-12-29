@@ -195,6 +195,7 @@ var Crucible = {
 	}
 };
 
+#include "crucible/Class.js"
 #include "crucible/Failure.js"
 #include "crucible/ExpectationFailure.js"
 #include "crucible/AsyncCompletion.js"
