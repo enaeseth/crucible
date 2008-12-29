@@ -1,0 +1,98 @@
+div#crucible_results {
+  font-size: 14px;
+  margin: 4em 6em;
+  border-color: #DDD;
+  border-style: solid;
+  border-top-width: 5px;
+  border-bottom-width: 5px;
+  padding: 1em 0;
+  background: white;
+  position: relative;
+}
+
+div#crucible_results h1 {
+  font-size: 170%;
+  color: #666;
+}
+
+div#crucible_results #crucible_status {
+  position: absolute;
+  top: 8px;
+  right: 6px;
+}
+
+div#crucible_results #crucible_start {
+  background-color: #DBF7C5;
+  font-size: 130%;
+  padding: 0.3em;
+  text-align: center;
+  margin: 0 auto 0 auto;
+  width: 8em;
+  border-radius: 5px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  cursor: pointer;
+}
+
+div#crucible_results table.tests {
+  margin: 0;
+  padding: 0;
+  border-collapse: collapse;
+}
+
+div#crucible_results table.tests td {
+  padding: 4px 6px;
+  border: 0px solid #CCC;
+  border-top-width: 1px;
+  border-bottom-width: 1px;
+}
+
+div#crucible_results table.tests td.message {
+  padding-left: 28px;
+}
+
+div#crucible_results .ready {
+  background-color: #E7F1FC;
+}
+
+div#crucible_results .pass {
+  background-color: #E7FADF;
+}
+
+div#crucible_results .fail {
+  background-color: #FAF8C4;
+  color: #514721;
+}
+
+div#crucible_results .exception {
+  background-color: #FBE3E4;
+  color: #8A1F11;
+}
+
+div#crucible_results table.tests tr.ready td {
+  background: url("icons/arrow.png") no-repeat scroll 5px center;
+}
+
+div#crucible_results table.tests tr.pass td {
+  background: url("icons/tick.png") no-repeat scroll 5px center;
+}
+
+div#crucible_results table.tests tr.fail td {
+  background: url("icons/exclamation.png") no-repeat scroll 5px center;
+}
+
+div#crucible_results table.tests tr.exception td {
+  background: url("icons/cross.png") no-repeat scroll 5px center;
+}
+
+div#crucible_results table.tests tr.busy td {
+  background: #F2E7FA url("icons/gear.png") no-repeat scroll 5px center;
+}
+
+div#crucible_results table.tests tr.prompt td {
+  background: #E7F1FC url("icons/question.png") no-repeat scroll 5px center;
+}
+
+div#crucible_results table.tests tr.log td {
+  background: #F9EFF9 url("icons/information.png") no-repeat scroll 5px center;
+}
