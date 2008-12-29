@@ -1,3 +1,5 @@
+#import "Runner.js"
+
 // Class: Crucible.TableRunner
 // A runner that shows its results in a nice table.
 Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
