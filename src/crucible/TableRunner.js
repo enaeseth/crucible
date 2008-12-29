@@ -22,6 +22,8 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 		}
 	},
 	
+	status: null,
+	
 	// Constructor: TableRunner
 	// Creates a new table runner.
 	initialize: function TableRunner(product, tests) {
@@ -38,6 +40,7 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 		
 		this.statusIndicator = build('div', {id: 'crucible_status'},
 			[this._statusIcon('waiting')]);
+		this.status = 'waiting';
 		this.root.appendChild(this.statusIndicator);
 		
 		this.startButton = build('div', {id: 'crucible_start'},
@@ -91,14 +94,20 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 	},
 	
 	_testPassed: function _test_passed(test) {
+		if (this.status == 'waiting')
+			this._changeGlobalStatus('pass');
 		this._updateStatus('pass', test.name);
 	},
 	
 	_testFailed: function _test_failed(test, info) {
+		if (this.status != 'exception')
+			this._changeGlobalStatus('fail');
 		this.updateStatus('fail', test.name + ': ' + info.description);
 	},
 	
 	_testThrewException: function _test_threw_exception(test, ex) {
+		if (this.status != 'exception')
+			this._changeGlobalStatus('exception');
 		this.updateStatus('exception', ex.name + ' in test &ldquo;' +
 			test.name + '&rdquo;: ' + ex.message);
 	},
@@ -113,6 +122,7 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 	},
 	
 	_changeGlobalStatus: function _change_global_status(status) {
+		this.status = status;
 		var n = this._statusIcon(status);
 		var i = this.statusIndicator;
 		i.replaceChild(n, i.firstChild);
