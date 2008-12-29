@@ -1,5 +1,6 @@
 #import "Delegator.js"
 #import "Assertions.js"
+#import "Tools.js"
 
 // Class: Crucible.Test
 // Represents a unit test within Crucible.
