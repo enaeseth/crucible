@@ -97,6 +97,96 @@ Crucible.Tools = {
 		}
 		
 		return attrs;
+	},
+	
+	element: function create_element(name, attrs, children)
+	{
+		var e = document.createElement(name.toUpperCase());
+
+		function collapse(i, dom_text)
+		{
+			switch (typeof(i)) {
+				case 'function':
+					return collapse(i(), dom_text);
+				case 'string':
+					return (dom_text) ? document.createTextNode(i) : i;
+				default:
+					return i;
+			}
+		}
+
+		function dim(dimension)
+		{
+			return (typeof(dimension) == 'number') ?
+				dimension + 'px' :
+				dimension;
+		}
+
+		var style = {};
+
+		for (var name in attrs || {}) {
+			var dest_name = name;
+
+			switch (name) {
+				case 'className':
+				case 'class':
+					var klass = attrs[name];
+
+					// Allow an array of classes to be passed in.
+					if (typeof(klass) != 'string' && klass.join)
+						klass = klass.join(' ');
+
+					e.className = klass;
+					continue; // note that this continues the for loop!
+				case 'htmlFor':
+					dest_name = 'for';
+					break;
+				case 'style':
+					if (typeof(style) == 'object') {
+						style = attrs.style;
+						continue; // note that this continues the for loop!
+					}
+			}
+
+			var a = attrs[name];
+			if (typeof(a) == 'boolean') {
+				if (a)
+					e.setAttribute(dest_name, dest_name);
+				else
+					continue;
+			} else {
+				e.setAttribute(dest_name, collapse(a, false));
+			}
+		}
+
+		for (var name in style) {
+			// Special cases
+			switch (name) {
+				case 'box':
+					var box = style[name];
+					e.style.left = dim(box[0]);
+					e.style.top = dim(box[1]);
+					e.style.width = dim(box[2]);
+					e.style.height = dim(box[3] || box[2]);
+					break;
+				case 'left':
+				case 'top':
+				case 'right':
+				case 'bottom':
+				case 'width':
+				case 'height':
+					e.style[name] = dim(style[name]);
+					break;
+				default:
+					e.style[name] = style[name];
+			}
+		}
+
+		Crucible.forEach(children || [], function(c) {
+			e.appendChild(collapse(c, true));
+		});
+
+		return e;
 	}
 };
 
