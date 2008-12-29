@@ -111,7 +111,7 @@ var Crucible = {
 	},
 	
 	bind: function bind_function(function_, thisp) {
-		if (typeof(thisp) == 'undefined')
+		if (!thisp)
 			return function_; // no wrapping needed
 		return function binder() {
 			return function_.apply(thisp, arguments);
