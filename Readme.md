@@ -29,3 +29,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 
 [carleton]: http://apps.carleton.edu/opensource/
+
+Acknowledgements
+----------------
+
+Crucible contains some code from the [Loki][loki] project, which is also owned
+by Carleton. Those portions of Loki that are found in Crucible are made
+available under Crucible's license, not under Loki's more restrictive LGPL
+license.
+
+[loki]: http://apps.carleton.edu/opensource/loki/
