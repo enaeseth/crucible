@@ -219,7 +219,15 @@ var Crucible = {
 		for (var i = 0; i < scripts.length; i++) {
 			if (pattern.test(scripts[i].src)) {
 				// Found Crucible!
-				return Crucible.base = scripts[i].src.replace(pattern, '');
+				Crucible.base = scripts[i].src.replace(pattern, '');
+				if (/build\/?$/.test(Crucible.base)) {
+					Crucible.base = Crucible.base.replace(/build\/?$/, '');
+				}
+				if (Crucible.base.charAt(Crucible.base.length - 1) == '/') {
+					Crucible.base = Crucible.base.substr(0,
+						Crucible.base.length - 1);
+				}
+				return Crucible.base;
 			}
 		}
 		
