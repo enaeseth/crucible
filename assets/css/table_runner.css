@@ -51,6 +51,7 @@ a {color:#009;text-decoration:underline;}
 blockquote {margin:1.5em;color:#666;font-style:italic;}
 
 div#crucible_results {
+  width: 100%;
   font-size: 14px;
   margin: 4em 6em;
   border-color: #DDD;
