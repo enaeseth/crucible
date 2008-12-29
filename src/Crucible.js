@@ -14,6 +14,69 @@ var Crucible = {
 	 */
 	base: null,
 	
+	defaultRunner: null,
+	tests: [],
+	_doneAdding: false,
+	_windowReady: false,
+	
+	settings: {
+		runner_class: 'TableRunner',
+		autorun: true
+	},
+	
+	add: function crucible_add(id, name, body) {
+		var key, tid, tests;
+		
+		if (typeof(id) == 'object') {
+			if (id instanceof Crucible.Test) {
+				this.tests.push(id);
+				return;
+			}
+			
+			tests = id;
+			for (key in tests) {
+				tid = Crucible.Test.parseID(key);
+				Crucible.add(tid[0], tid[1], tests[key]);
+			}
+			return;
+		} else if (typeof(name) == 'object') {
+			tests = name;
+			for (key in tests) {
+				key = [id, key].join('.');
+				tid = Crucible.Test.parseID(key);
+				Crucible.add(tid[0], tid[1], tests[key]);
+			}
+			return;
+		} else if (typeof(name) == 'function') {
+			body = name;
+			name = null;
+		} else if (typeof(id) != 'string') {
+			throw new Error('Must identify the test being added.');
+		}
+		
+		var test = new Crucible.Test(id, name, body);
+		this.tests.push(test);
+		return test;
+	},
+	
+	addFixture: function crucible_add_fixture(id, name, spec) {
+		if (typeof(name) == 'object') {
+			spec = name;
+			name = null;
+		} else if (typeof(id) != 'string') {
+			throw new Error('Must identify the fixture being added.');
+		}
+		
+		return new Crucible.Fixture(id, name, spec);
+	},
+	
+	doneAdding: function crucible_done_adding() {
+		Crucible._doneAdding = true;
+		if (Crucible._windowReady) {
+			
+		}
+	},
+	
 	/**
 	 * Copies all properties from the source object to the destination.
 	 * @param {Object} destination the object to which the properties are copied
@@ -200,3 +263,5 @@ var Crucible = {
 #import "crucible/Delegator.js"
 #import "crucible/Assertions.js"
 #import "crucible/Preferences.js"
+#import "crucible/Fixture.js"
+#import "crucible/TableRunner.js"
