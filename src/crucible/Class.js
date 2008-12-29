@@ -31,7 +31,7 @@ Crucible.Class = {
 	//                 given) is not a function
 	create: function create_class(superclass, prototype) {
 		if (arguments.length === 0) {
-			superclass = null;
+			superclass = undefined;
 			prototype = {};
 		} else if (arguments.length == 1) {
 			prototype = superclass;

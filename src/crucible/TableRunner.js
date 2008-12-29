@@ -27,7 +27,7 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 	initialize: function TableRunner(product, tests) {
 		var build = Crucible.Tools.element;
 		var runner = this;
-		TableRunner.superclass.initialize.call(this, product, tests);
+		TableRunner.superclass.call(this, product, tests);
 		
 		Crucible.Tools.addStyleSheet(Crucible.base +
 			'/assets/css/table_runner.css');
