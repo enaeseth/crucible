@@ -63,8 +63,8 @@ Crucible.Test.parseID = function parse_test_id(id) {
 	
 	var name;
 	if (pos > -1) {
-		id = Crucible.Tools.trim(id.substr(pos));
 		name = Crucible.Tools.trim(id.substr(pos + 1));
+		id = Crucible.Tools.trim(id.substr(0, pos));
 	} else {
 		name = null;
 	}
