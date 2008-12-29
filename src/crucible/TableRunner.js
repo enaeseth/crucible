@@ -36,6 +36,8 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 		this.startButton = build('div', {id: 'crucible_start'},
 			'Start Testing');
 		this.root.appendChild(this.startButton);
+		
+		document.body.insertBefore(this.root, document.body.firstChild);
 	},
 	
 	_statusIcon: function _make_status_icon(which) {
