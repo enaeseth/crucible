@@ -159,7 +159,7 @@ Crucible.Test.Segment = Crucible.Class.create({
 		if (typeof(this.expected) == 'string')
 			return (exc.name == this.expected);
 		return true;
-	}
+	},
 	
 	report: function report_segment_result(status, result) {
 		this.test.reportResult(status, result || null);
