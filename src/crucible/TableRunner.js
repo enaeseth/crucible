@@ -103,13 +103,13 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 	_testFailed: function _test_failed(test, info) {
 		if (this.status != 'errors')
 			this._changeGlobalStatus('failing');
-		this.updateStatus('fail', test.name + ': ' + info.description);
+		this._updateStatus('fail', test.name + ': ' + info.description);
 	},
 	
 	_testThrewException: function _test_threw_exception(test, ex) {
 		if (this.status != 'errors')
 			this._changeGlobalStatus('errors');
-		this.updateStatus('exception', ex.name + ' in test &ldquo;' +
+		this._updateStatus('exception', ex.name + ' in test &ldquo;' +
 			test.name + '&rdquo;: ' + ex.message);
 	},
 	
