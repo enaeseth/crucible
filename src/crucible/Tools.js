@@ -181,7 +181,9 @@ Crucible.Tools = {
 					e.style[name] = style[name];
 			}
 		}
-
+		
+		if (typeof(children) == 'string')
+			children = [children];
 		Crucible.forEach(children || [], function(c) {
 			e.appendChild(collapse(c, true));
 		});
