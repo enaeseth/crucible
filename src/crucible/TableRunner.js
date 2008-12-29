@@ -61,8 +61,8 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 		for (name in events) {
 			this.events[name].add(this, '_test' + events[name]);
 		}
-		this.events.started.add(this, '_startedTesting');
-		this.events.finished.add(this, '_finishedTesting');
+		this.events.start.add(this, '_startedTesting');
+		this.events.finish.add(this, '_finishedTesting');
 	},
 	
 	_startedTesting: function _started_testing() {
