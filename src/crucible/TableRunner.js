@@ -33,7 +33,7 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 			'/assets/css/table_runner.css');
 		
 		this.root = build('div', {id: 'crucible_results'});
-		this.root.appendChild('h1', {}, this.product);
+		this.root.appendChild(build('h1', {}, this.product));
 		
 		this.statusIndicator = build('div', {id: 'crucible_status'},
 			[this._statusIcon('waiting')]);
