@@ -29,6 +29,7 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 		var runner = this;
 		TableRunner.superclass.call(this, product, tests);
 		
+		Crucible.determineBase();
 		Crucible.Tools.addStyleSheet(Crucible.base +
 			'/assets/css/table_runner.css');
 		
@@ -105,7 +106,7 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 	_statusIcon: function _make_status_icon(which) {
 		var info = this.icons[which];
 		return Crucible.Tools.element('img', {
-			src: info.src,
+			src: Crucible.base + '/' + info.src,
 			alt: info.alt,
 			title: info.alt
 		});
