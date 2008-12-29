@@ -65,10 +65,13 @@ Crucible.Tools = {
 			var a = elem.attributes[i];
 			if (!a.specified || a.nodeName in attrs)
 				continue;
-				
-			var v = (a.nodeValue.toString)
-				? a.nodeValue.toString()
-				: a.nodeValue;
+			
+			var v;
+			try {
+				v = a.nodeValue.toString();
+			} catch (e) {
+				v = a.nodeValue;
+			}
 			
 			switch (a.nodeName) {
 				case 'class':
