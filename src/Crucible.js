@@ -42,8 +42,7 @@ var Crucible = {
 		} else if (typeof(name) == 'object' && name !== null) {
 			tests = name;
 			for (key in tests) {
-				key = [id, key].join('.');
-				tid = Crucible.Test.parseID(key);
+				tid = Crucible.Test.parseID([id, key].join('.'));
 				Crucible.add(tid[0], tid[1], tests[key]);
 			}
 			return;
