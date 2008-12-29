@@ -87,6 +87,7 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 		row.appendChild(cell);
 		this.currentRow = row;
 		this.table.appendChild(row);
+		row.scrollIntoView();
 	},
 	
 	_updateStatus: function _update_test_status(status, message) {
