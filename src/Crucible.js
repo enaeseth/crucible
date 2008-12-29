@@ -177,6 +177,17 @@ var Crucible = {
 		return keys;
 	},
 	
+	forEach: function for_each(iterable, fn, context) {
+		if (!context)
+			context = null;
+		
+		var i, length = iterable.length;
+		for (i = 0; i < length; i++) {
+			if (i in iterable)
+				fn.call(context, iterable[i], i, iterable);
+		}
+	},
+	
 	/**
 	 * A function that does nothing. Useful as a standin.
 	 * @return {void}
