@@ -1,3 +1,6 @@
+#import "Delegator.js"
+#import "Assertions.js"
+
 // Class: Crucible.Test
 // Represents a unit test within Crucible.
 Crucible.Test = Crucible.Class.create({
@@ -9,16 +12,17 @@ Crucible.Test = Crucible.Class.create({
 	// The test's human-readable name.
 	name: null,
 	
-	// var: fixture
-	// A reference to the test's fixture, if any.
-	fixture: null,
-	
-	// var: helpers
-	helpers: null,
+	// var: context
+	// The "this" context in which the test code will run. By default, this
+	// object will include the contents of <Crucible.Assertions>. Test segments
+	// will add an expect method and a reference to the current test at "test".
+	context: null,
 	
 	// var: root
 	// The test's root segment. (see <Crucible.Test.Segment>)
 	root: null,
+	
+	events: null,
 		
 	// Constructor: Test
 	// Creates a new test.
@@ -32,25 +36,22 @@ Crucible.Test = Crucible.Class.create({
 		this.id = id;
 		this.name = name || id || null;
 		this.fixture = fixture || null;
-		this.helpers = [];
+		this.context = new Crucible.Test.Context();
 		this.root = new Crucible.Test.Segment(this, body);
+		
+		this.events = {
+			run: new Crucible.Delegator("run test"),
+			result: new Crucible.Delegator("test result available")
+		};
 	},
 	
-	getContext: function get_test_context_object() {
-		if (!this.context) {
-			if (this.fixture)
-				this.context = this.fixture.getContext() || {};
-			else
-				this.context = {};
-
-			Crucible.forEach(this.helpers, function(helper) {
-				if (typeof(helper) == 'function')
-					helper = new helper();
-				Crucible.augment(this.context, helper);
-			}, this);
-		}
-
-		return this.context;
+	run: function run_test() {
+		this.events.run.call(this);
+		this.root.run(this.context);
+	},
+	
+	reportResult: function report_test_result(status, result) {
+		this.events.result.call(this, status, result);
 	}
 });
 
@@ -89,14 +90,13 @@ Crucible.Test.Segment = Crucible.Class.create({
 	
 	// Method: run
 	// Runs the test segment.
-	run: function run_segment(callback, context) {
-		this.callback = callback;
+	run: function run_segment(context) {
 		this.context = context || null;
 		
 		try {
-			var body_context = this.test.getContext();
-			body_context.expect = Crucible.bind(this.expect, this);
-			this.body.call(body_context);
+			this.context.expect = Crucible.bind(this.expect, this);
+			this.context.test = this.test;
+			this.body.call(this.context);
 		} catch (e) {
 			if (e.name == "Crucible.AsyncCompletion") {
 				this.callback = this.context = null;
@@ -145,6 +145,11 @@ Crucible.Test.Segment = Crucible.Class.create({
 	}
 	
 	report: function report_segment_result(status, result) {
-		this.callback.call(this.context, this.test, status, result || null);
+		this.test.reportResult(status, result || null);
 	}
 });
+
+Crucible.Test.Context = function Context() {
+	
+};
+Crucible.Test.Context.prototype = Crucible.Assertions;
