@@ -86,6 +86,7 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 		cell.innerHTML = 'Running &ldquo;' + test.name + '&rdquo;&hellip;';
 		row.appendChild(cell);
 		this.currentRow = row;
+		this.table.appendChild(row);
 	},
 	
 	_updateStatus: function _update_test_status(status, message) {
