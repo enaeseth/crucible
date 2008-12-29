@@ -61,7 +61,7 @@ Crucible.Tools = {
 	 * @return {Object}	an object whose keys are attribute names and whose
 	 *					values are the corresponding values
 	 */
-	get_attributes: function get_element_attributes(elem)
+	getAttributes: function get_element_attributes(elem)
 	{
 		var attrs = {};
 		
