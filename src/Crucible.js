@@ -79,7 +79,8 @@ var Crucible = {
 	
 	_createRunner: function crucible_create_runner() {
 		var Runner = Crucible[Crucible.settings.runner_class];
-		Crucible.defaultRunner = new Runner(Crucible.product || null);
+		Crucible.defaultRunner = new Runner(Crucible.product || null,
+			Crucible.tests);
 		
 		if (Crucible.settings.autorun)
 			Crucible.run();
