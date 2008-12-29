@@ -20,7 +20,7 @@ Crucible.Fixture = Crucible.Class.create({
 	//     (Object) spec - the fixture specification
 	initialize: function Fixture(id, name, spec) {
 		this.id = id;
-		this.name = name || null;
+		this.name = name || id || null;
 		
 		if (typeof(spec) != 'object') {
 			throw new Error('Fixture spec must be an object.');
