@@ -53,6 +53,24 @@ Crucible.Test = Crucible.Class.create({
 	}
 });
 
+// Function: parseID
+// Parses a test ID.
+Crucible.Test.parseID = function parse_test_id(id) {
+	if (typeof(id) != 'string')
+		throw new TypeError("Test ID must be a string.");
+	var pos = id.indexOf(':');
+	
+	var name = (pos > -1) ?
+		Crucible.Tools.trim(id.substr(pos + 1)) :
+		null;
+	id = Crucible.Tools.trim(id.substr(pos));
+	
+	var ret = [id, name];
+	ret.id = id;
+	ret.name = name;
+	return ret;
+};
+
 // Class: Crucible.Test.Segment
 // One synchronusly-executing part of a test.
 Crucible.Test.Segment = Crucible.Class.create({
