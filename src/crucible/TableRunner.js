@@ -41,7 +41,7 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 		
 		this.startButton = build('div', {id: 'crucible_start'},
 			'Start Testing');
-		Crucible.observe(this.startButton, 'click', function() {
+		Crucible.observeEvent(this.startButton, 'click', function() {
 			runner.run();
 		});
 		this.root.appendChild(this.startButton);
