@@ -26,7 +26,7 @@ Crucible.Fixture = Crucible.Class.create({
 			throw new Error('Fixture spec must be an object.');
 		}
 		
-		name, tid, test;
+		var name, tid;
 		for (name in spec) {
 			if (name == 'setUp' || name == 'set_up') {
 				this.setUp = spec[name];
@@ -64,8 +64,10 @@ Crucible.Fixture = Crucible.Class.create({
 			throw new Error('Must identify the test being added.');
 		}
 		
-		tid = Crucible.Test.parseID(id);
-		test = Crucible.add([this.id, tid.id].join('.'), tid.name, spec[id]);
+		tid = Crucible.Test.parseID([this.id, id].join('.'));
+		if (tid.name)
+			name = tid.name;
+		test = Crucible.add(tid.id, name, body);
 		test.events.run.add(this, '_beforeTest');
 		test.events.result.add(this, '_afterTest');
 		return test;
