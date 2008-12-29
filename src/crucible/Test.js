@@ -122,11 +122,11 @@ Crucible.Test.Segment = Crucible.Class.create({
 				this.callback = this.context = null;
 				return false;
 			} else if (e._crucible_failure) {
-				this.report('fail', e);
+				return this.report('fail', e);
 			} else if (this.wasExpected(e)) {
-				this.report('pass', e);
+				return this.report('pass', e);
 			} else {
-				this.report('exception', e);
+				return this.report('exception', e);
 			}
 		}
 		
@@ -141,13 +141,10 @@ Crucible.Test.Segment = Crucible.Class.create({
 			
 			exc = new Crucible.Failure(this.test, "Expected " + which +
 				" to be thrown, but none was.");
-			this.report('fail', exc);
+			return this.report('fail', exc);
 		} else {
-			this.report('pass');
+			return this.report('pass');
 		}
-		
-		this.callback = this.context = null;
-		return true;
 	},
 	
 	expect: function segment_expect_exception(name) {
@@ -165,7 +162,9 @@ Crucible.Test.Segment = Crucible.Class.create({
 	},
 	
 	report: function report_segment_result(status, result) {
+		this.callback = this.context = null;
 		this.test.reportResult(status, result || null);
+		return true;
 	}
 });
 
