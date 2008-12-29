@@ -55,7 +55,9 @@ Crucible.Runner = Crucible.Class.create({
 	},
 	
 	_runTest: function _runner_run_test() {
-		if (this.queue.length == 0) {
+		if (!this.queue) {
+			return;
+		} else if (this.queue.length == 0) {
 			this.events.finish.call();
 			this.running = false;
 			delete this.queue;
@@ -64,7 +66,7 @@ Crucible.Runner = Crucible.Class.create({
 		
 		var test = this.queue.pop();
 		this.events.run.call(test);
-		Crucible.defer(function() {
+		Crucible.defer(function run_test_later() {
 			test.run();
 		});
 	},
@@ -72,7 +74,7 @@ Crucible.Runner = Crucible.Class.create({
 	_processResult: function _process_test_result(test, status, result) {
 		this.events[status].call(test, result || null);
 		this.events.result.call(test, status, result || null);
-		Crucible.defer(function() {
+		Crucible.defer(function run_next_test_later() {
 			this._runTest();
 		}, this);
 	}
