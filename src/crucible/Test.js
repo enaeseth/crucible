@@ -35,7 +35,7 @@ Crucible.Test = Crucible.Class.create({
 	initialize: function Test(id, name, body) {
 		this.id = id;
 		this.name = name || id || null;
-		this.context = new Crucible.Test.Context();
+		this.context = new Crucible.Test.Context(this);
 		this.root = new Crucible.Test.Segment(this, body);
 		
 		this.events = {
@@ -166,7 +166,7 @@ Crucible.Test.Segment = Crucible.Class.create({
 	}
 });
 
-Crucible.Test.Context = function Context() {
-	
+Crucible.Test.Context = function Context(test) {
+	this._test = test;
 };
 Crucible.Test.Context.prototype = Crucible.Assertions;
