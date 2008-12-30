@@ -133,19 +133,19 @@ div#crucible_results .exception {
 }
 
 div#crucible_results table.tests tr.ready td {
-  background: url("../icons/arrow.png") no-repeat scroll 5px center;
+  background: #E7F1FC url("../icons/arrow.png") no-repeat scroll 5px center;
 }
 
 div#crucible_results table.tests tr.pass td {
-  background: url("../icons/tick.png") no-repeat scroll 5px center;
+  background: #E7FADF url("../icons/tick.png") no-repeat scroll 5px center;
 }
 
 div#crucible_results table.tests tr.fail td {
-  background: url("../icons/exclamation.png") no-repeat scroll 5px center;
+  background: #FAF8C4 url("../icons/exclamation.png") no-repeat scroll 5px center;
 }
 
 div#crucible_results table.tests tr.exception td {
-  background: url("../icons/cross.png") no-repeat scroll 5px center;
+  background: #FBE3E4 url("../icons/cross.png") no-repeat scroll 5px center;
 }
 
 div#crucible_results table.tests tr.busy td {
