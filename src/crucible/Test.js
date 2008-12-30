@@ -44,9 +44,18 @@ Crucible.Test = Crucible.Class.create({
 		};
 	},
 	
-	run: function run_test() {
+	run: function run_test(callbacks, callback_context) {
+		this.callbacks = callbacks || null;
+		this.callback_context = callback_context || this.callbacks;
 		this.events.run.call(this);
 		this.root.run(this.context);
+	},
+	
+	log: function test_log() {
+		if (!this.callbacks || !this.callbacks.log)
+			return;
+		
+		this.callbacks.log.apply(callback_context, arguments);
 	},
 	
 	reportResult: function report_test_result(status, result) {
@@ -168,7 +177,13 @@ Crucible.Test.Segment = Crucible.Class.create({
 	}
 });
 
-Crucible.Test.Context = function Context(test) {
-	this._test = test;
-};
+Crucible.Test.Context = Crucible.Class.create({
+	initialize: function Context(test) {
+		this._test = test;
+	},
+	
+	log: function test_context_log() {
+		this._test.log.apply(this._test, arguments);
+	}
+});
 Crucible.Test.Context.prototype = Crucible.Assertions;

@@ -67,6 +67,7 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 		}
 		this.events.start.add(this, '_startedTesting');
 		this.events.finish.add(this, '_finishedTesting');
+		this.events.log.add(this, '_logMessage');
 	},
 	
 	_startedTesting: function _started_testing() {
@@ -79,15 +80,40 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 		// TODO: build results table
 	},
 	
-	_testStarted: function _test_started(test) {
+	_logMessage: function _log_message(parts) {
+		var message = [], i, length, arg, part;
+
+		for (i = 0, length = arguments.length; i < length; ++i) {
+			arg = arguments[i];
+			part = (typeof(arg) == 'string') ?
+				arg :
+				Crucible.Tools.inspect(arg);
+
+			part = Crucible.Tools.gsub(part, '<', '&lt;');
+			part = Crucible.Tools.gsub(part, '>', '&gt;');
+
+			if (typeof(arg) != 'string')
+				part = '<code>' + part + '</code>';
+			message.push(part);
+		}
+
+		this._createRow('log', message.join(' '));
+	},
+	
+	_createRow: function _create_row(type, message) {
 		var build = Crucible.Tools.element;
-		var row = build('tr', {'class': 'busy'});
+		var row = build('tr', {'class': type});
 		var cell = build('td', {'class': 'message'});
-		cell.innerHTML = 'Running &ldquo;' + test.name + '&rdquo;&hellip;';
+		cell.innerHTML = message;
 		row.appendChild(cell);
-		this.currentRow = row;
 		this.table.appendChild(row);
 		row.scrollIntoView();
+		return row;
+	},
+	
+	_testStarted: function _test_started(test) {
+		this.currentRow = this._createRow('busy',
+			'Running &ldquo;' + test.name + '&rdquo;&hellip;');
 	},
 	
 	_updateStatus: function _update_test_status(status, message) {

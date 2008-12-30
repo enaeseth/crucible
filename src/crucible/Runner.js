@@ -21,6 +21,7 @@ Crucible.Runner = Crucible.Class.create({
 		this.events = {
 			start: new Crucible.Delegator("started testing"),
 			run: new Crucible.Delegator("test started"),
+			log: new Crucible.Delegator("message logged"),
 			pass: new Crucible.Delegator("test passed"),
 			fail: new Crucible.Delegator("test failed"),
 			exception: new Crucible.Delegator("test threw an exception"),
@@ -54,6 +55,10 @@ Crucible.Runner = Crucible.Class.create({
 		this._runTest();
 	},
 	
+	log: function runner_log() {
+		this.events.log.call(arguments);
+	},
+	
 	_runTest: function _runner_run_test() {
 		if (!this.queue) {
 			return;
@@ -67,8 +72,8 @@ Crucible.Runner = Crucible.Class.create({
 		var test = this.queue.pop();
 		this.events.run.call(test);
 		Crucible.defer(function run_test_later() {
-			test.run();
-		});
+			test.run(this);
+		}, this);
 	},
 	
 	_processResult: function _process_test_result(test, status, result) {
