@@ -83,8 +83,8 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 	_logMessage: function _log_message(parts) {
 		var message = [], i, length, arg, part;
 
-		for (i = 0, length = arguments.length; i < length; ++i) {
-			arg = arguments[i];
+		for (i = 0, length = parts.length; i < length; ++i) {
+			arg = parts[i];
 			part = (typeof(arg) == 'string') ?
 				arg :
 				Crucible.Tools.inspect(arg);
