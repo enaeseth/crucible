@@ -23,6 +23,7 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 	},
 	
 	status: null,
+	tallies: null,
 	
 	// Constructor: TableRunner
 	// Creates a new table runner.
@@ -50,6 +51,12 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 		});
 		this.root.appendChild(this.startButton);
 		
+		this.tallies = {
+			pass: 0,
+			fail: 0,
+			exception: 0
+		};
+		
 		this._listenForEvents();
 		document.body.insertBefore(this.root, document.body.firstChild);
 	},
@@ -59,6 +66,7 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 			run: 'Started',
 			pass: 'Passed',
 			fail: 'Failed',
+			result: 'Finished',
 			exception: 'ThrewException'
 		};
 		var name;
@@ -77,7 +85,40 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 	},
 	
 	_finishedTesting: function _finished_testing() {
-		// TODO: build results table
+		function round(number) {
+			// yes, it's ghetto... stfu
+			try {
+				return String(number).match(/\d+(\.\d)?/)[0];
+			} catch (e) {
+				return '0';
+			}
+		}
+		var build = Crucible.Tools.element;
+		
+		var tallies = this.tallies;
+		var total_tests = tallies.pass + tallies.fail + tallies.exception;
+		
+		function make_row(which, title) {
+			var percent = (total_tests > 0) ?
+				'(' + round(100 * (tallies[which] / total_tests)) + '%)' :
+				'';
+			
+			var row = build('tr', {'class': which});
+			row.appendChild(build('th', {}, title));
+			row.appendChild(build('td', {}, String(tallies[which])));
+			row.appendChild(build('td', {}, percent));
+			return row;
+		}
+		
+		var table = build('table', {id: 'crucible_tally'});
+		var last;
+		table.appendChild(make_row('pass', 'Passed'));
+		table.appendChild(make_row('fail', 'Failed'));
+		table.appendChild(last = make_row('exception', 'Errors'));
+		
+		this.root.appendChild(build('h2', {}, 'Test Results'));
+		this.root.appendChild(table);
+		last.scrollIntoView();
 	},
 	
 	_logMessage: function _log_message(parts) {
@@ -131,6 +172,10 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 		if (this.status != 'errors')
 			this._changeGlobalStatus('failing');
 		this._updateStatus('fail', test.name + ': ' + info.description);
+	},
+	
+	_testFinished: function _test_finished(test, status) {
+		this.tallies[status]++;
 	},
 	
 	_testThrewException: function _test_threw_exception(test, ex) {
