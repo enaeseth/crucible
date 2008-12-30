@@ -30,10 +30,8 @@ Crucible.Fixture = Crucible.Class.create({
 		for (name in spec) {
 			if (name == 'setUp' || name == 'set_up') {
 				this.setUp = spec[name];
-				delete spec[name];
 			} else if (name == 'tearDown' || name == 'tear_down') {
 				this.tearDown = spec[name];
-				delete spec[name];
 			} else {
 				tid = Crucible.Test.parseID(name);
 				this.add(tid.id, tid.name, spec[name]);
