@@ -55,7 +55,7 @@ Crucible.Test = Crucible.Class.create({
 		if (!this.callbacks || !this.callbacks.log)
 			return;
 		
-		this.callbacks.log.apply(callback_context, arguments);
+		this.callbacks.log.apply(this.callback_context, arguments);
 	},
 	
 	reportResult: function report_test_result(status, result) {
@@ -185,4 +185,4 @@ Crucible.Test.Context = Crucible.Class.create({
 		this._test.log.apply(this._test, arguments);
 	}
 });
-Crucible.Test.Context.prototype = Crucible.Assertions;
+Crucible.Class.mixin(Crucible.Test.Context, Crucible.Assertions);
