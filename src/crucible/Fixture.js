@@ -1,121 +1,84 @@
-/**
- * @class Test fixture.
- * @param {String} [name] an optional name for the test fixture
- */
-Crucible.Fixture = function Fixture(name) {
-	this.name = name || null;
-	this.tests = [];
-};
+#import "Test.js"
 
-Crucible.augment(Crucible.Fixture.prototype,
-	/** @lends Crucible.Fixture.prototype */
-{
-	/**
-	 * The name of the test fixture.
-	 * @type String
-	 */
+// Class: Crucible.Fixture
+// A collection of tests with an associated context and set-up and tear-down
+// routines.
+Crucible.Fixture = Crucible.Class.create({
+	// var: id
+	id: null,
+	
+	// var: name
 	name: null,
 	
-	/**
-	 * All the tests that have been added to the fixture.
-	 * @type Array
-	 */
-	tests: null,
-	
-	/**
-	 * This function will be called when the fixture is added to a runner, and
-	 * should perform any overall setup.
-	 * @return {void}
-	 */
-	initialize: Crucible.emptyFunction,
-	
-	/**
-	 * This function will be called when the runner completes, and should undo
-	 * any setup that was performed in initialize.
-	 * @return {void}
-	 */
-	uninitialize: Crucible.emptyFunction,
-	
-	/**
-	 * This function should perform any setup that needs to be run before each
-	 * test.
-	 * @return {void}
-	 */
-	setUp: Crucible.emptyFunction,
-	
-	/**
-	 * This function should undo any actions taken by setUp, restoring the
-	 * fixture to a pristine state.
-	 * @return {void}
-	 */
-	tearDown: Crucible.emptyFunction,
-	
-	add: function add_test_to_fixture(name, test, expected) {
-		this.tests.push((typeof(name) == 'object')
-			? name
-			: new Crucible.Test(name, test, expected));
-	}
-});
-
-/**
- * Constructs a new FixtureHandler.
- * @class Source handler for Crucible fixtures.
- */
-Crucible.Fixture.Handler = function FixtureHandler() {
-	
-};
-
-Crucible.Fixture.Handler.prototype =
-	new Crucible.SourceHandler(Crucible.Fixture);
-Crucible.augment(Crucible.Fixture.Handler.prototype,
-	/** @lends Crucible.Fixture.Handler.prototype */
-{
-	getTests: function get_tests_from_fixture(fixture) {
-		return fixture.tests;
+	// Constructor: Fixture
+	// Creates a new fixture.
+	//
+	// Parameters:
+	//     (String) id - the base of the identifying string for the fixture's
+	//                   tests
+	//     (String) name - the fixture's human-readable name
+	//     (Object) spec - the fixture specification
+	initialize: function Fixture(id, name, spec) {
+		this.id = id;
+		this.name = name || id || null;
+		
+		if (typeof(spec) != 'object') {
+			throw new Error('Fixture spec must be an object.');
+		}
+		
+		var name, tid;
+		for (name in spec) {
+			if (name == 'setUp' || name == 'set_up') {
+				this.setUp = spec[name];
+			} else if (name == 'tearDown' || name == 'tear_down') {
+				this.tearDown = spec[name];
+			} else {
+				tid = Crucible.Test.parseID(name);
+				this.add(tid.id, tid.name, spec[name]);
+			}
+		}
 	},
 	
-	run: function run_fixture(parent, fixture, runner) {
-		var cur_test = -1;
-		
-		runner.sourceOpened.call(parent, fixture);
-		
-		if (fixture.tests.length == 0) {
-			runner.sourceClosed.call(parent, fixture);
+	add: function add_to_fixture(id, name, body) {
+		var key, tests, tid, test;
+		if (typeof(id) == 'object') {
+			tests = id;
+			for (key in tests) {
+				tid = Crucible.Test.parseID(key);
+				this.add(tid[0], tid[1], tests[key]);
+			}
 			return;
-		}
-		
-		fixture.testContext = {};
-		fixture.initialize.call(fixture.testContext);
-		
-		function next_test() {
-			cur_test++;
-			if (cur_test >= fixture.tests.length) {
-				return false;
+		} else if (typeof(name) == 'object') {
+			tests = name;
+			for (key in tests) {
+				tid = Crucible.Test.parseID([id, key].join('.'));
+				this.add(tid[0], tid[1], tests[key]);
 			}
-			
-			fixture.setUp.call(fixture.testContext);
-			
-			Crucible.defer(function(test) {
-				Crucible.getHandler(test).run(fixture, test, runner);
-			}, null, fixture.tests[cur_test]);
-			return true;
+			return;
+		} else if (typeof(name) == 'function') {
+			body = name;
+			name = null;
+		} else if (typeof(id) != 'string') {
+			throw new Error('Must identify the test being added.');
 		}
 		
-		function source_closed(source_parent, closed_source) {
-			if (closed_source == fixture.tests[cur_test]) {
-				fixture.tearDown.call(fixture.testContext);
-				
-				if (!next_test()) {
-					fixture.uninitialize.call(fixture.testContext);
-					runner.sourceClosed.remove(source_closed, fixture);
-					runner.sourceClosed.call(parent, fixture);
-				}
-			}
-		}
-		runner.sourceClosed.add(source_closed, fixture);
-		
-		next_test();
-	}
+		tid = Crucible.Test.parseID([this.id, id].join('.'));
+		if (tid.name)
+			name = tid.name;
+		test = Crucible.add(tid.id, name, body);
+		test.events.run.add(this, '_beforeTest');
+		test.events.result.add(this, '_afterTest');
+		return test;
+	},
+	
+	_beforeTest: function _fixture_do_set_up(test) {
+		this.setUp(test);
+	},
+	
+	_afterTest: function _fixture_do_tear_down(test) {
+		this.tearDown(test);
+	},
+	
+	setUp: Crucible.emptyFunction,
+	tearDown: Crucible.emptyFunction
 });
-
-Crucible.addSourceHandler(new Crucible.Fixture.Handler());

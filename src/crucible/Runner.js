@@ -1,82 +1,86 @@
-/**
- * Creates a new runner, setting up delegators for each possible event.
- * @class Abstract class; skeleton of a runner for Crucible tests.
- */
-Crucible.Runner = function Runner() {
-	var i, length, ev;
-	this.sources = [];
-	for (i = 0, length = Crucible.Runner.events.length; i < length; i++) {
-		ev = Crucible.Runner.events[i];
-		this[ev] = new Crucible.Delegator(ev);
-	}
-};
-
-Crucible.augment(Crucible.Runner.prototype,
-	/** @lends Crucible.Runner.prototype */
-{
-	sources: null,
-	source_index: null,
-	current_test: null,
+// Class: Crucible.Runner
+// Runs Crucible tests.
+Crucible.Runner = Crucible.Class.create({
+	product: null,
+	tests: null,
 	
-	add: function add_test_source_to_runner(name, test, expected) {
-		this.sources.push((typeof(name) == 'object')
-			? name
-			: new Crucible.Test(name, test, expected));
-	},
+	events: null,
 	
-	doneAdding: function done_adding_sources_to_runner() {
-		// default implementation does nothing
-	},
-	
-	run: function runner_run() {
-		this.sourceClosed.add(this._sourceClosed, this);
-		
-		this.started.call();
-		this.runSource(0);
-	},
-	
-	_sourceClosed: function _runner_source_closed(parent, source) {
-		if (source == this.sources[this.source_index]) {
-			this.runSource(this.source_index + 1);
+	// Constructor: Runner
+	// Creates a new test runner.
+	//
+	// Parameters:
+	//     (Crucible.Test[]) tests - the tests to be run
+	initialize: function Runner(product, tests) {
+		this.product = product || '(unknown product)';
+		this.tests = [];
+		if (tests) {
+			Crucible.forEach(tests, this.add, this);
 		}
+		
+		this.events = {
+			start: new Crucible.Delegator("started testing"),
+			run: new Crucible.Delegator("test started"),
+			log: new Crucible.Delegator("message logged"),
+			pass: new Crucible.Delegator("test passed"),
+			fail: new Crucible.Delegator("test failed"),
+			exception: new Crucible.Delegator("test threw an exception"),
+			result: new Crucible.Delegator("test finished"),
+			finish: new Crucible.Delegator("finished testing")
+		};
 	},
 	
-	finish: function runner_cleanup() {
-		this.sourceClosed.remove(this._sourceClosed, this);
-		this.completed.call();
-		this.source_index = null;
+	// Method: add
+	// Adds a test to the runner.
+	//
+	// Parameters:
+	//     (Crucible.Test) test - the test to add
+	add: function add_to_runner(test) {
+		test.events.result.add(this, '_processResult');
+		this.tests.push(test);
 	},
 	
-	runSource: function runner_run_source(index) {
-		this.source_index = index;
-		if (this.source_index >= this.sources.length) {
-			this.finish();
+	// Method: run
+	// Runs the tests.
+	run: function run_tests() {
+		if (this.running) {
+			throw new Error('Already running!');
+		}
+		
+		this.queue = this.tests.slice(0); // clone
+		this.queue.reverse();
+		this.running = true;
+		
+		this.events.start.call();
+		this._runTest();
+	},
+	
+	log: function runner_log() {
+		this.events.log.call(arguments);
+	},
+	
+	_runTest: function _runner_run_test() {
+		if (!this.queue) {
+			return;
+		} else if (this.queue.length == 0) {
+			this.events.finish.call();
+			this.running = false;
+			delete this.queue;
 			return;
 		}
 		
-		Crucible.getHandler(this.sources[index]).run(null, this.sources[index],
-			this);
+		var test = this.queue.pop();
+		this.events.run.call(test);
+		Crucible.defer(function run_test_later() {
+			test.run(this);
+		}, this);
 	},
 	
-	report: function report_result_to_runner(test, result) {
-		if (result === true) {
-			this.testPassed.call(test);
-		} else if (result._crucible_failure) {
-			this.testFailed.call(test, result);
-		} else if (result.name == 'Crucible.UnexpectedError') {
-			this.testError.call(test, result);
-		} else {
-			throw new Error('Unable to understand test result: ' + result);
-		}
-		this.testFinished.call(test, result);
-	},
-	
-	displayMessage: function runner_display_message(message, buttons) {
-		throw new Error('The base Crucible.Runner cannot display messages.');
+	_processResult: function _process_test_result(test, status, result) {
+		this.events[status].call(test, result || null);
+		this.events.result.call(test, status, result || null);
+		Crucible.defer(function run_next_test_later() {
+			this._runTest();
+		}, this);
 	}
 });
-
-/** @ignore */
-Crucible.Runner.events = ['started', 'sourceOpened', 'testStarted',
-	'testFinished', 'testPassed', 'testFailed', 'testError',
-	'sourceClosed', 'completed'];

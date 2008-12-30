@@ -6,13 +6,20 @@
  * @augments Error
  */
 Crucible.Failure = function Failure(test, message) {
-	var err = new Error('Failure in test "' + test.name + '": ' + message)
+	var err = new Error('Failure in test "' + test.name + '": ' + message);
+	
+	function filter_html(text) {
+		return text.replace(Crucible.Failure.HTML, '');
+	}
 	
 	err.name = "Crucible.Failure";
 	err.description = message || null;
+	err.plainDescription = (message) ? filter_html(message) : null;
 	err.test = test || null;
 	
 	err._crucible_failure = true;
 	
 	return err;
 };
+
+Crucible.Failure.HTML = /<\/?(\w+:)?\w:[^>]*>/g;

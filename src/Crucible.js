@@ -14,35 +14,81 @@ var Crucible = {
 	 */
 	base: null,
 	
-	/**
-	 * All registered Crucible test source handlers.
-	 * @type Crucible.SourceHandler[]
-	 */
-	handlers: [],
+	defaultRunner: null,
+	tests: [],
+	_doneAdding: false,
+	_windowReady: false,
 	
-	/**
-	 * Registers a new source handler with Crucible.
-	 * @param {Crucible.SourceHandler} handler the new handler
-	 * @return {void}
-	 */
-	addSourceHandler: function add_source_handler(handler) {
-		Crucible.handlers.push(handler);
+	settings: {
+		runner_class: 'TableRunner',
+		autorun: true
 	},
 	
-	/**
-	 * Gets the proper handler for the source.
-	 * @param {Object} source the test source
-	 * @return {Crucible.SourceHandler} the source's handler
-	 * @throws {Error} if no handler could be found
-	 */
-	getHandler: function get_source_handler(source) {
-		var i, len;
-		for (i = 0, len = Crucible.handlers.length; i < len; ++i) {
-			if (Crucible.handlers[i].handles(source))
-				return Crucible.handlers[i];
+	add: function crucible_add(id, name, body) {
+		var key, tid, tests;
+		
+		if (typeof(id) == 'object') {
+			if (id instanceof Crucible.Test) {
+				this.tests.push(id);
+				return;
+			}
+			
+			tests = id;
+			for (key in tests) {
+				tid = Crucible.Test.parseID(key);
+				Crucible.add(tid[0], tid[1], tests[key]);
+			}
+			return;
+		} else if (typeof(name) == 'object' && name !== null) {
+			tests = name;
+			for (key in tests) {
+				tid = Crucible.Test.parseID([id, key].join('.'));
+				Crucible.add(tid[0], tid[1], tests[key]);
+			}
+			return;
+		} else if (typeof(name) == 'function') {
+			body = name;
+			name = null;
+		} else if (typeof(id) != 'string') {
+			throw new Error('Must identify the test being added.');
 		}
 		
-		throw new Error('No source handler accepted the given source.');
+		var test = new Crucible.Test(id, name, body);
+		this.tests.push(test);
+		return test;
+	},
+	
+	addFixture: function crucible_add_fixture(id, name, spec) {
+		if (typeof(name) == 'object') {
+			spec = name;
+			name = null;
+		} else if (typeof(id) != 'string') {
+			throw new Error('Must identify the fixture being added.');
+		}
+		
+		return new Crucible.Fixture(id, name, spec);
+	},
+	
+	doneAdding: function crucible_done_adding() {
+		Crucible._doneAdding = true;
+		if (Crucible._windowReady) {
+			Crucible._createRunner();
+		}
+	},
+	
+	_createRunner: function crucible_create_runner() {
+		var Runner = Crucible[Crucible.settings.runner_class];
+		Crucible.defaultRunner = new Runner(Crucible.product || null,
+			Crucible.tests);
+		
+		if (Crucible.settings.autorun)
+			Crucible.run();
+		
+		return Crucible.defaultRunner;
+	},
+	
+	run: function crucible_run() {
+		Crucible.defaultRunner.run();
 	},
 	
 	/**
@@ -142,7 +188,7 @@ var Crucible = {
 	},
 	
 	bind: function bind_function(function_, thisp) {
-		if (typeof(thisp) == 'undefined')
+		if (!thisp)
 			return function_; // no wrapping needed
 		return function binder() {
 			return function_.apply(thisp, arguments);
@@ -163,21 +209,6 @@ var Crucible = {
 		return Crucible.delay.apply(Crucible, args);
 	},
 	
-	addStyleSheet: function add_style_sheet(path) {
-		var heads = document.getElementsByTagName('HEAD');
-		var head, link;
-		
-		if (!heads.length)
-			throw new Error('Document has no HEAD.');
-		head = heads[0];
-		
-		link = document.createElement('LINK');
-		link.rel = 'stylesheet';
-		link.type = 'text/css';
-		link.href = path;
-		return head.appendChild(link);
-	},
-	
 	determineBase: function determine_base_uri() {
 		if (Crucible.base)
 			return Crucible.base;
@@ -188,7 +219,15 @@ var Crucible = {
 		for (var i = 0; i < scripts.length; i++) {
 			if (pattern.test(scripts[i].src)) {
 				// Found Crucible!
-				return Crucible.base = scripts[i].src.replace(pattern, '');
+				Crucible.base = scripts[i].src.replace(pattern, '');
+				if (/build\/?$/.test(Crucible.base)) {
+					Crucible.base = Crucible.base.replace(/build\/?$/, '');
+				}
+				if (Crucible.base.charAt(Crucible.base.length - 1) == '/') {
+					Crucible.base = Crucible.base.substr(0,
+						Crucible.base.length - 1);
+				}
+				return Crucible.base;
 			}
 		}
 		
@@ -206,6 +245,17 @@ var Crucible = {
 		for (var name in obj)
 			keys.push(name);
 		return keys;
+	},
+	
+	forEach: function for_each(iterable, fn, context) {
+		if (!context)
+			context = null;
+		
+		var i, length = iterable.length;
+		for (i = 0; i < length; i++) {
+			if (i in iterable)
+				fn.call(context, iterable[i], i, iterable);
+		}
 	},
 	
 	/**
@@ -226,16 +276,21 @@ var Crucible = {
 	}
 };
 
-#include "crucible/Failure.js"
-#include "crucible/ExpectationFailure.js"
-#include "crucible/AsyncCompletion.js"
-#include "crucible/UnexpectedError.js"
-#include "crucible/Tools.js"
-#include "crucible/Delegator.js"
-#include "crucible/SourceHandler.js"
-#include "crucible/Assertions.js"
-#include "crucible/Test.js"
-#include "crucible/Fixture.js"
-#include "crucible/Preferences.js"
-#include "crucible/Runner.js"
-#include "crucible/PrettyRunner.js"
+Crucible.observeEvent(window, 'load', function _crucible_window_loaded() {
+	Crucible._windowReady = true;
+	if (Crucible._doneAdding) {
+		Crucible._createRunner();
+	}
+});
+
+#import "crucible/Class.js"
+#import "crucible/Failure.js"
+#import "crucible/ExpectationFailure.js"
+#import "crucible/AsyncCompletion.js"
+#import "crucible/UnexpectedError.js"
+#import "crucible/Tools.js"
+#import "crucible/Delegator.js"
+#import "crucible/Assertions.js"
+#import "crucible/Preferences.js"
+#import "crucible/Fixture.js"
+#import "crucible/TableRunner.js"
