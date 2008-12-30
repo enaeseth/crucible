@@ -124,7 +124,6 @@ Crucible.Test.Segment = Crucible.Class.create({
 		
 		try {
 			this.context.expect = Crucible.bind(this.expect, this);
-			this.context.test = this.test;
 			this.body.call(this.context);
 		} catch (e) {
 			if (e.name == "Crucible.AsyncCompletion") {
