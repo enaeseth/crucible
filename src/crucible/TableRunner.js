@@ -30,7 +30,7 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 	initialize: function TableRunner(product, tests) {
 		var build = Crucible.Tools.element;
 		var runner = this;
-		TableRunner.superclass.call(this, product, tests);
+		Crucible.TableRunner.superclass.call(this, product, tests);
 		
 		Crucible.determineBase();
 		Crucible.Tools.addStyleSheet(Crucible.base +
@@ -81,6 +81,8 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 	_startedTesting: function _started_testing() {
 		var build = Crucible.Tools.element;
 		this.table = build('table', {'class': 'tests'});
+		this.table_body = build('tbody');
+		this.table.appendChild(this.table_body);
 		this.startButton.parentNode.replaceChild(this.table, this.startButton);
 	},
 	
@@ -111,10 +113,13 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 		}
 		
 		var table = build('table', {id: 'crucible_tally'});
+		var tbody = build('tbody');
+		table.appendChild(tbody);
+		
 		var last;
-		table.appendChild(make_row('pass', 'Passed'));
-		table.appendChild(make_row('fail', 'Failed'));
-		table.appendChild(last = make_row('exception', 'Errors'));
+		tbody.appendChild(make_row('pass', 'Passed'));
+		tbody.appendChild(make_row('fail', 'Failed'));
+		tbody.appendChild(last = make_row('exception', 'Errors'));
 		
 		this.root.appendChild(build('h2', {}, 'Test Results'));
 		this.root.appendChild(table);
@@ -147,7 +152,7 @@ Crucible.TableRunner = Crucible.Class.create(Crucible.Runner, {
 		var cell = build('td', {'class': 'message'});
 		cell.innerHTML = message;
 		row.appendChild(cell);
-		this.table.appendChild(row);
+		this.table_body.appendChild(row);
 		row.scrollIntoView();
 		return row;
 	},
