@@ -42,12 +42,12 @@ Crucible.Runner = Crucible.Class.create({
 	
 	// Method: run
 	// Runs the tests.
-	run: function run_tests() {
+	run: function run_tests(filters) {
 		if (this.running) {
 			throw new Error('Already running!');
 		}
 		
-		this.queue = this.tests.slice(0); // clone
+		this.queue = this._filter(this.tests, filters);
 		this.queue.reverse();
 		this.running = true;
 		
@@ -57,6 +57,35 @@ Crucible.Runner = Crucible.Class.create({
 	
 	log: function runner_log() {
 		this.events.log.call(arguments);
+	},
+	
+	_filter: function _runner_apply_filters(tests, filters) {
+	    var filtered, filter_regexp_parts, filter;
+	    
+	    function glob_to_regexp(glob) {
+	        // Temporarily convert the glob "*" character to something that's
+	        // not a special regular expression character.
+	        glob = glob.replace('*', '__WILDCARD__');
+	        glob = Crucible.escapeRegexp(glob);
+	        return '(?:' + glob.replace('__WILDCARD__', '.*') + ')';
+	    }
+	    
+	    if (!filters) {
+	        return tests.slice(0); // slice makes a shallow clone of the list
+	    } else {
+	        filter_regexp_parts = [];
+	        Crucible.forEach(filters, function compile_filter(filter) {
+	            filter_regexp_parts.push(glob_to_regexp(filter));
+	        });
+	        filter = new RegExp('^' + filter_regexp_parts.join('|') + '$', 'i');
+	        
+	        filtered = [];
+	        Crucible.forEach(tests, function filter_test(test) {
+	            if (filter.test(test.id))
+	                filtered.push(test);
+	        }, this);
+	        return filtered;
+	    }
 	},
 	
 	_runTest: function _runner_run_test() {

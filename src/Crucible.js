@@ -21,7 +21,8 @@ var Crucible = {
 	
 	settings: {
 		runner_class: 'TableRunner',
-		autorun: true
+		autorun: true,
+		filters: null
 	},
 	
 	add: function crucible_add(id, name, body) {
@@ -76,6 +77,40 @@ var Crucible = {
 		}
 	},
 	
+	_readQuerySettings: function crucible_read_settings_from_query_params() {
+	    var query = window.location.search;
+	    if (!query)
+	        return;
+	    
+	    query = query.replace(/^\?/, '').split('&');
+	    
+	    Crucible.forEach(query, function process_setting(setting) {
+	        var name, value, word_value, int_value;
+	        var equals = setting.indexOf('=');
+	        
+	        if (!(1 + equals)) /* if no equals sign */ {
+	            name = setting;
+	            value = true;
+	        } else {
+	            name = setting.substr(0, equals);
+	            value = setting.substr(equals + 1);
+	            word_value = value.toLowerCase();
+	            
+	            if (name == "filters") {
+	                value = value.split(/\s*,\s*/);
+	            } else if (word_value == "true" || word_value == "yes") {
+	                value = true;
+	            } else if (word_value == "false" || word_value == "no") {
+	                value = false;
+	            } else if (!isNaN(int_value = parseInt(value))) {
+	                value = int_value;
+	            }
+	        }
+	        
+	        this.settings[name] = value;
+	    }, Crucible);
+	},
+	
 	_createRunner: function crucible_create_runner() {
 		var Runner = Crucible[Crucible.settings.runner_class];
 		Crucible.defaultRunner = new Runner(Crucible.product || null,
@@ -88,7 +123,7 @@ var Crucible = {
 	},
 	
 	run: function crucible_run() {
-		Crucible.defaultRunner.run();
+		Crucible.defaultRunner.run(Crucible.settings.filters);
 	},
 	
 	/**
@@ -273,11 +308,16 @@ var Crucible = {
 	 */
 	constantFunction: function(value) {
 		return value;
+	},
+	
+	escapeRegexp: function(text) {
+	    return String(text).replace(/([.*+?^=!:${}()|[\]\/\\])/g, '\\$1');
 	}
 };
 
 Crucible.observeEvent(window, 'load', function _crucible_window_loaded() {
 	Crucible._windowReady = true;
+	Crucible._readQuerySettings();
 	if (Crucible._doneAdding) {
 		Crucible._createRunner();
 	}
