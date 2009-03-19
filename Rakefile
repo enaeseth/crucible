@@ -5,7 +5,7 @@ require 'rake/clean'
 CRUCIBLE_PATH = File.expand_path(File.dirname(__FILE__))
 CRUCIBLE_SRC = File.join(CRUCIBLE_PATH, 'src')
 CRUCIBLE_PKG = File.join(CRUCIBLE_PATH, 'pkg')
-CRUCIBLE_VER = '0.2a1'
+CRUCIBLE_VER = '0.2a2'
 
 task :default => [:script]
 
