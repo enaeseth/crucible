@@ -5,14 +5,14 @@ Crucible.Assertions = {
 	assertEqual: function assert_equal(expected, actual, message) {
 		if (!Crucible.equal(expected, actual)) {
 			throw new Crucible.ExpectationFailure(this._test || null, expected,
-				actual);
+				actual, message || null);
 		}
 	},
 	
 	assertSame: function assert_same(expected, actual, message) {
 		if (expected !== actual) {
 			throw new Crucible.ExpectationFailure(this._test || null, expected,
-				actual);
+				actual, message || null);
 		}
 	},
 	
